@@ -49,3 +49,5 @@ target_link_libraries(demo_xnnpack PRIVATE
   XNNPACK
 )
 
+add_subdirectory(tests)
+
