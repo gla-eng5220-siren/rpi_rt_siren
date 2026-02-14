@@ -20,16 +20,16 @@ public:
   using elem_t = Elem;
   static_assert(std::is_same_v<Elem, float>, "Only F32 is implemented for DepthwiseConv2D");
 
-  // assumes (channels, kernel_width, kernel_height) shape
+  // assumes (channels, kernel_height, kernel_width) shape
   class Params {
   public:
     Params() {}
 
-    Params(size_t channels, size_t kernel_width, size_t kernel_height) {
-      resize(channels, kernel_width, kernel_height);
+    Params(size_t channels, size_t kernel_height, size_t kernel_width) {
+      resize(channels, kernel_height, kernel_width);
     }
 
-    void resize(size_t channels, size_t kernel_width, size_t kernel_height) {
+    void resize(size_t channels, size_t kernel_height, size_t kernel_width) {
       channels_ = channels;
       kernel_width_ = kernel_width;
       kernel_height_ = kernel_height;
@@ -94,14 +94,14 @@ public:
 
   private:
     size_t channels_ = 0;
-    size_t kernel_width_ = 0;
     size_t kernel_height_ = 0;
+    size_t kernel_width_ = 0;
     std::vector<elem_t> buffer_;
 
-    size_t stride_width_ = 1;
     size_t stride_height_ = 1;
-    size_t padding_width_ = 0;
+    size_t stride_width_ = 1;
     size_t padding_height_ = 0;
+    size_t padding_width_ = 0;
   };
 
   DepthwiseConv2D() {}

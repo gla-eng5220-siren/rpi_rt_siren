@@ -14,11 +14,11 @@ public:
 
   Frame() {}
 
-  Frame(size_t width, size_t height, size_t channels) {
-    resize(width, height, channels);
+  Frame(size_t height, size_t width, size_t channels) {
+    resize(height, width, channels);
   }
 
-  void resize(size_t width, size_t height, size_t channels) {
+  void resize(size_t height, size_t width, size_t channels) {
     width_ = width;
     height_ = height;
     channels_ = channels;
@@ -38,7 +38,7 @@ public:
   }
 
   size_t size() const noexcept {
-    return width() * height() * channels();
+    return height() * width() * channels();
   }
 
   const Elem* data() const noexcept {
@@ -50,8 +50,8 @@ public:
   }
 
 private:
-  size_t width_ = 0;
   size_t height_ = 0;
+  size_t width_ = 0;
   size_t channels_ = 0;
   std::vector<elem_t> buffer_;
 };
