@@ -193,7 +193,7 @@ TEST_CASE("DepthwiseConv2D", "[shufflenet][kernels]") {
   CHECK(compare_result(output_frame.data(), output_data.data(), output_data.size()));
 }
 
-TEST_CASE("Branch1Demo", "[shufflenet][kernels]") {
+TEST_CASE("Branch1Demo", "[shufflenet][branchs]") {
   using rpi_rt::logic::shufflenet::Frame;
   using rpi_rt::logic::shufflenet::Branch1;
 
@@ -221,7 +221,7 @@ TEST_CASE("Branch1Demo", "[shufflenet][kernels]") {
   CHECK(compare_result(output_frame.data(), output_data.data(), output_data.size()));
 }
 
-TEST_CASE("Branch2Demo", "[shufflenet][kernels]") {
+TEST_CASE("Branch2Demo", "[shufflenet][branchs]") {
   using rpi_rt::logic::shufflenet::Frame;
   using rpi_rt::logic::shufflenet::Branch2;
 
@@ -253,7 +253,7 @@ TEST_CASE("Branch2Demo", "[shufflenet][kernels]") {
   CHECK(compare_result(output_frame.data(), output_data.data(), output_data.size()));
 }
 
-TEST_CASE("InvertedResidualDemo", "[shufflenet][kernels]") {
+TEST_CASE("InvertedResidualDemo", "[shufflenet][repeats]") {
   using rpi_rt::logic::shufflenet::Frame;
   using rpi_rt::logic::shufflenet::InvertedResidual;
 
@@ -293,7 +293,7 @@ TEST_CASE("InvertedResidualDemo", "[shufflenet][kernels]") {
   CHECK(compare_result(output_frame.data(), output_data.data(), output_data.size()));
 }
 
-TEST_CASE("InvertedResidualChunkingDemo", "[shufflenet][kernels]") {
+TEST_CASE("InvertedResidualChunkingDemo", "[shufflenet][repeats]") {
   using rpi_rt::logic::shufflenet::Frame;
   using rpi_rt::logic::shufflenet::InvertedResidual;
 
