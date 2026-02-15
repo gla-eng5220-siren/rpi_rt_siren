@@ -89,6 +89,34 @@ TEST_CASE("FusedConv2dBatchNorm", "[shufflenet][kernels]") {
   CHECK(compare_result(output_frame.data(), output_data.data(), output_data.size()));
 }
 
+TEST_CASE("FusedConv2dBatchNormRelu", "[shufflenet][kernels]") {
+  using rpi_rt::logic::shufflenet::Frame;
+  using rpi_rt::logic::shufflenet::Conv2D;
+
+  Frame<float> input_frame(56, 56, 24);
+  Frame<float> output_frame(56, 56, 24);
+
+  Conv2D<float>::Params params(24, 1, 1, 24);
+  params.stride_width(1);
+  params.stride_height(1);
+  params.add_bias();
+  params.relu(true);
+
+  auto input_data = load_testdata("fused_batchnorm_input");
+  auto output_data = load_testdata("fused_batchnorm_output_after_relu");
+  auto weight_data = load_testdata("fused_batchnorm_weight");
+  auto bias_data = load_testdata("fused_batchnorm_bias");
+  std::copy(input_data.begin(), input_data.end(), input_frame.data());
+  std::copy(weight_data.begin(), weight_data.end(), params.data());
+  std::copy(bias_data.begin(), bias_data.end(), params.bias().data());
+
+  Conv2D<float> conv2d;
+  conv2d.setup(input_frame, output_frame, params);
+  conv2d.forward();
+
+  CHECK(compare_result(output_frame.data(), output_data.data(), output_data.size()));
+}
+
 TEST_CASE("DepthwiseConv2d", "[shufflenet][kernels]") {
   using rpi_rt::logic::shufflenet::Frame;
   using rpi_rt::logic::shufflenet::DepthwiseConv2D;

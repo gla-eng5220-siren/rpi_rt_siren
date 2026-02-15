@@ -125,6 +125,14 @@ public:
       return *bias_;
     }
 
+    bool relu() const noexcept {
+      return relu_;
+    }
+
+    void relu(bool fuse) noexcept {
+      relu_ = fuse;
+    }
+
   private:
     size_t output_feature_ = 0;
     size_t kernel_width_ = 0;
@@ -137,7 +145,9 @@ public:
     size_t padding_width_ = 0;
     size_t padding_height_ = 0;
 
-    std::optional<Bias<elem_t>> bias_;
+    std::optional<Bias<elem_t>> bias_ = std::nullopt;
+
+    bool relu_ = false;
   };
 
   Conv2D() {}
@@ -171,7 +181,7 @@ public:
         params.output_feature(),
         params.data(),
         params.has_bias() ? params.bias().data() : nullptr,
-        -INFINITY, INFINITY,
+        params.relu() ? 0 : -INFINITY, INFINITY,
         0,
         nullptr,
         &conv_op_);
