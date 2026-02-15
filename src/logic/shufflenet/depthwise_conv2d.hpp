@@ -7,6 +7,7 @@
 #include <vector>
 #include <cmath>
 #include <cassert>
+#include <optional>
 
 #include "xnnpack.h"
 #include "xnn_common.hpp"
@@ -34,6 +35,9 @@ public:
       kernel_width_ = kernel_width;
       kernel_height_ = kernel_height;
       buffer_.resize(size());
+      if (bias_.has_value()) {
+        bias_->resize(channels_);
+      }
     }
 
     size_t channels() const noexcept {
@@ -92,6 +96,30 @@ public:
       return padding_height_;
     }
 
+    void add_bias() {
+      if (! bias_.has_value()) {
+        bias_.emplace(channels_);
+      }
+    }
+
+    void remove_bias() {
+      if (bias_.has_value()) {
+        bias_ = std::nullopt;
+      }
+    }
+
+    bool has_bias() const noexcept {
+      return bias_.has_value();
+    }
+
+    Bias<elem_t>& bias() noexcept {
+      return *bias_;
+    }
+
+    const Bias<elem_t>& bias() const noexcept {
+      return *bias_;
+    }
+
   private:
     size_t channels_ = 0;
     size_t kernel_height_ = 0;
@@ -102,6 +130,8 @@ public:
     size_t stride_width_ = 1;
     size_t padding_height_ = 0;
     size_t padding_width_ = 0;
+
+    std::optional<Bias<elem_t>> bias_ = std::nullopt;
   };
 
   DepthwiseConv2D() {}
@@ -134,7 +164,7 @@ public:
         params.channels(),
         params.channels(),
         params.data(),
-        nullptr,
+        params.has_bias() ? params.bias().data() : nullptr,
         -INFINITY, INFINITY,
         0,
         nullptr,
