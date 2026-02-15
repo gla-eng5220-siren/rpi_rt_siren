@@ -61,7 +61,7 @@ public:
 
     void add_bias() {
       if (! bias_.has_value()) {
-        bias_.emplace(channels_);
+        bias_.emplace(output_feature_);
       }
     }
 
@@ -116,7 +116,8 @@ public:
     status = xnn_create_fully_connected_nc_f32(
         params.input_feature(),
         params.output_feature(),
-        1, 1,
+        params.input_feature(),
+        params.output_feature(),
         params.data(),
         params.has_bias() ? params.bias().data() : nullptr,
         -INFINITY, INFINITY,

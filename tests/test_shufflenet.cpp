@@ -8,6 +8,7 @@
 #include "src/logic/shufflenet/frame.hpp"
 #include "src/logic/shufflenet/depthwise_conv2d.hpp"
 #include "src/logic/shufflenet/maxpool2d.hpp"
+#include "src/logic/shufflenet/fc.hpp"
 #include "src/logic/shufflenet/global_average_pool2d.hpp"
 #include "src/logic/shufflenet/conv2d.hpp"
 #include "src/logic/shufflenet/branch1.hpp"
@@ -84,6 +85,31 @@ TEST_CASE("GlobalAveragePool2D", "[shufflenet][kernels]") {
   GlobalAveragePool2D<float> pool;
   pool.setup(input_frame, output_frame);
   pool.forward();
+
+  CHECK(compare_result(output_frame.data(), output_data.data(), output_data.size()));
+}
+
+TEST_CASE("Fc", "[shufflenet][kernels]") {
+  using rpi_rt::logic::shufflenet::Frame;
+  using rpi_rt::logic::shufflenet::Fc;
+
+  Frame<float> input_frame(1, 1, 64);
+  Frame<float> output_frame(1, 1, 1);
+
+  Fc<float>::Params params(1, 64);
+  params.add_bias();
+
+  auto input_data = load_testdata("fc_input");
+  auto output_data = load_testdata("fc_output");
+  auto weight_data = load_testdata("fc_weight");
+  auto bias_data = load_testdata("fc_bias");
+  std::copy(input_data.begin(), input_data.end(), input_frame.data());
+  std::copy(weight_data.begin(), weight_data.end(), params.data());
+  std::copy(bias_data.begin(), bias_data.end(), params.bias().data());
+
+  Fc<float> fc;
+  fc.setup(input_frame, output_frame, params);
+  fc.forward();
 
   CHECK(compare_result(output_frame.data(), output_data.data(), output_data.size()));
 }
