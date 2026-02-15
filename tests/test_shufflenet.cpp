@@ -28,12 +28,14 @@ std::vector<float> load_testdata(std::string path) {
 }
 
 bool compare_result(const float* a, const float* b, size_t size, float eps = 0.001) {
+  float max_error = 0;
   for (size_t i = 0; i < size; i++) {
-    if (a[i] - b[i] > eps) {
-      return false;
+    if (a[i] - b[i] > max_error) {
+      max_error = a[i] - b[i];
     }
   }
-  return true;
+  // std::cout << "error: " << max_error << std::endl;
+  return max_error < eps;
 }
 
 TEST_CASE("Conv2d", "[shufflenet][kernels]") {
@@ -53,7 +55,32 @@ TEST_CASE("Conv2d", "[shufflenet][kernels]") {
   std::copy(input_data.begin(), input_data.end(), input_frame.data());
   std::copy(weight_data.begin(), weight_data.end(), params.data());
 
-  std::cout << input_data[0] << std::endl;
+  Conv2D<float> conv2d;
+  conv2d.setup(input_frame, output_frame, params);
+  conv2d.forward();
+
+  CHECK(compare_result(output_frame.data(), output_data.data(), output_data.size()));
+}
+
+TEST_CASE("FusedConv2dBatchNorm", "[shufflenet][kernels]") {
+  using rpi_rt::logic::shufflenet::Frame;
+  using rpi_rt::logic::shufflenet::Conv2D;
+
+  Frame<float> input_frame(56, 56, 24);
+  Frame<float> output_frame(56, 56, 24);
+
+  Conv2D<float>::Params params(24, 1, 1, 24);
+  params.stride_width(1);
+  params.stride_height(1);
+  params.add_bias();
+
+  auto input_data = load_testdata("fused_batchnorm_input");
+  auto output_data = load_testdata("fused_batchnorm_output");
+  auto weight_data = load_testdata("fused_batchnorm_weight");
+  auto bias_data = load_testdata("fused_batchnorm_bias");
+  std::copy(input_data.begin(), input_data.end(), input_frame.data());
+  std::copy(weight_data.begin(), weight_data.end(), params.data());
+  std::copy(bias_data.begin(), bias_data.end(), params.bias().data());
 
   Conv2D<float> conv2d;
   conv2d.setup(input_frame, output_frame, params);
@@ -80,8 +107,6 @@ TEST_CASE("DepthwiseConv2d", "[shufflenet][kernels]") {
   auto weight_data = load_testdata("depthwise_conv2d_weight");
   std::copy(input_data.begin(), input_data.end(), input_frame.data());
   std::copy(weight_data.begin(), weight_data.end(), params.data());
-
-  std::cout << input_data[0] << std::endl;
 
   DepthwiseConv2D<float> conv2d;
   conv2d.setup(input_frame, output_frame, params);

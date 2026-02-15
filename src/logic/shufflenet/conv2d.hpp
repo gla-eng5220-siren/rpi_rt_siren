@@ -1,5 +1,6 @@
 #pragma once
 
+#include <optional>
 #include <stdexcept>
 #include <type_traits>
 #include <vector>
@@ -35,6 +36,9 @@ public:
       kernel_height_ = kernel_height;
       input_feature_ = input_feature;
       buffer_.resize(size());
+      if (bias_.has_value()) {
+        bias_->resize(output_feature_);
+      }
     }
 
     size_t output_feature() const noexcept {
@@ -97,6 +101,30 @@ public:
       return padding_height_;
     }
 
+    void add_bias() {
+      if (! bias_.has_value()) {
+        bias_.emplace(output_feature_);
+      }
+    }
+
+    void remove_bias() {
+      if (bias_.has_value()) {
+        bias_ = std::nullopt;
+      }
+    }
+
+    bool has_bias() const noexcept {
+      return bias_.has_value();
+    }
+
+    Bias<elem_t>& bias() noexcept {
+      return *bias_;
+    }
+
+    const Bias<elem_t>& bias() const noexcept {
+      return *bias_;
+    }
+
   private:
     size_t output_feature_ = 0;
     size_t kernel_width_ = 0;
@@ -108,6 +136,8 @@ public:
     size_t stride_height_ = 1;
     size_t padding_width_ = 0;
     size_t padding_height_ = 0;
+
+    std::optional<Bias<elem_t>> bias_;
   };
 
   Conv2D() {}
@@ -140,7 +170,7 @@ public:
         params.input_feature(),
         params.output_feature(),
         params.data(),
-        nullptr,
+        params.has_bias() ? params.bias().data() : nullptr,
         -INFINITY, INFINITY,
         0,
         nullptr,

@@ -27,5 +27,38 @@ private:
   }
 };
 
+template <class Elem>
+class Bias {
+public:
+    Bias() {}
+
+    Bias(size_t channels) {
+      resize(channels);
+    }
+
+    void resize(size_t channels) {
+      buffer_.resize(channels);
+    }
+
+    size_t channels() const noexcept {
+      return buffer_.size();
+    }
+
+    size_t size() const noexcept {
+      return channels();
+    }
+
+    const Elem* data() const noexcept {
+      return buffer_.data();
+    }
+
+    Elem* data() noexcept {
+      return buffer_.data();
+    }
+
+private:
+  std::vector<Elem> buffer_;
+};
+
 }
 
