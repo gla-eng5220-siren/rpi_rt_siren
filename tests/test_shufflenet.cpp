@@ -10,6 +10,7 @@
 #include "src/logic/shufflenet/conv2d.hpp"
 #include "src/logic/shufflenet/branch1.hpp"
 #include "src/logic/shufflenet/branch2.hpp"
+#include "src/logic/shufflenet/inverted_residual.hpp"
 
 #ifndef TESTDATA_PATH
   #define TESTDATA_PATH "testdata"
@@ -36,7 +37,6 @@ bool compare_result(const float* a, const float* b, size_t size, float eps = 0.0
       max_error = a[i] - b[i];
     }
   }
-  // std::cout << "error: " << max_error << std::endl;
   return max_error < eps;
 }
 
@@ -201,6 +201,79 @@ TEST_CASE("Branch2Demo", "[shufflenet][kernels]") {
   Branch2<float> x2;
   x2.setup(input_frame, output_frame, params);
   x2.forward();
+
+  CHECK(compare_result(output_frame.data(), output_data.data(), output_data.size()));
+}
+
+TEST_CASE("InvertedResidualDemo", "[shufflenet][kernels]") {
+  using rpi_rt::logic::shufflenet::Frame;
+  using rpi_rt::logic::shufflenet::InvertedResidual;
+
+  Frame<float> input_frame(56, 56, 24);
+  Frame<float> output_frame(28, 28, 48);
+
+  InvertedResidual<float>::Params params(48, 24, 2);
+
+  auto x1w0 = load_testdata("demo_x1w0");
+  auto x1w1 = load_testdata("demo_x1w1");
+  auto x1b0 = load_testdata("demo_x1b0");
+  auto x1b1 = load_testdata("demo_x1b1");
+  auto x2w0 = load_testdata("demo_x2w0");
+  auto x2w1 = load_testdata("demo_x2w1");
+  auto x2w2 = load_testdata("demo_x2w2");
+  auto x2b0 = load_testdata("demo_x2b0");
+  auto x2b1 = load_testdata("demo_x2b1");
+  auto x2b2 = load_testdata("demo_x2b2");
+  auto input_data = load_testdata("demo_input");
+  auto output_data = load_testdata("demo_output");
+  std::copy(input_data.begin(), input_data.end(), input_frame.data());
+  std::copy(x1w0.begin(), x1w0.end(), params.data('1', 'w', '0'));
+  std::copy(x1w1.begin(), x1w1.end(), params.data('1', 'w', '1'));
+  std::copy(x1b0.begin(), x1b0.end(), params.data('1', 'b', '0'));
+  std::copy(x1b1.begin(), x1b1.end(), params.data('1', 'b', '1'));
+  std::copy(x2w0.begin(), x2w0.end(), params.data('2', 'w', '0'));
+  std::copy(x2w1.begin(), x2w1.end(), params.data('2', 'w', '1'));
+  std::copy(x2w2.begin(), x2w2.end(), params.data('2', 'w', '2'));
+  std::copy(x2b0.begin(), x2b0.end(), params.data('2', 'b', '0'));
+  std::copy(x2b1.begin(), x2b1.end(), params.data('2', 'b', '1'));
+  std::copy(x2b2.begin(), x2b2.end(), params.data('2', 'b', '2'));
+
+  InvertedResidual<float> r;
+  r.setup(input_frame, output_frame, params);
+  r.forward();
+
+  CHECK(compare_result(output_frame.data(), output_data.data(), output_data.size()));
+}
+
+TEST_CASE("InvertedResidualChunkingDemo", "[shufflenet][kernels]") {
+  using rpi_rt::logic::shufflenet::Frame;
+  using rpi_rt::logic::shufflenet::InvertedResidual;
+
+  Frame<float> input_frame(28, 28, 48);
+  Frame<float> output_frame(28, 28, 48);
+
+  InvertedResidual<float>::Params params(48, 48, 1);
+  CHECK(!params.has_branch1());
+
+  auto x2w0 = load_testdata("chunking_x2w0");
+  auto x2w1 = load_testdata("chunking_x2w1");
+  auto x2w2 = load_testdata("chunking_x2w2");
+  auto x2b0 = load_testdata("chunking_x2b0");
+  auto x2b1 = load_testdata("chunking_x2b1");
+  auto x2b2 = load_testdata("chunking_x2b2");
+  auto input_data = load_testdata("chunking_input");
+  auto output_data = load_testdata("chunking_output");
+  std::copy(input_data.begin(), input_data.end(), input_frame.data());
+  std::copy(x2w0.begin(), x2w0.end(), params.data('2', 'w', '0'));
+  std::copy(x2w1.begin(), x2w1.end(), params.data('2', 'w', '1'));
+  std::copy(x2w2.begin(), x2w2.end(), params.data('2', 'w', '2'));
+  std::copy(x2b0.begin(), x2b0.end(), params.data('2', 'b', '0'));
+  std::copy(x2b1.begin(), x2b1.end(), params.data('2', 'b', '1'));
+  std::copy(x2b2.begin(), x2b2.end(), params.data('2', 'b', '2'));
+
+  InvertedResidual<float> r;
+  r.setup(input_frame, output_frame, params);
+  r.forward();
 
   CHECK(compare_result(output_frame.data(), output_data.data(), output_data.size()));
 }
