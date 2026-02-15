@@ -7,6 +7,7 @@
 
 #include "src/logic/shufflenet/frame.hpp"
 #include "src/logic/shufflenet/depthwise_conv2d.hpp"
+#include "src/logic/shufflenet/conv2d.hpp"
 
 #ifndef TESTDATA_PATH
   #define TESTDATA_PATH "testdata"
@@ -14,7 +15,6 @@
 
 std::vector<float> load_testdata(std::string path) {
   std::ifstream ifs{std::string(TESTDATA_PATH) + "/" + path, std::ios::binary};
-  // ifs.exceptions(std::ios::failbit | std::ios::badbit);
   ifs.unsetf(std::ios::skipws);
   ifs.seekg(0, std::ios::end);
   auto size = ifs.tellg() / sizeof(float);
@@ -34,6 +34,32 @@ bool compare_result(const float* a, const float* b, size_t size, float eps = 0.0
     }
   }
   return true;
+}
+
+TEST_CASE("Conv2d", "[shufflenet][kernels]") {
+  using rpi_rt::logic::shufflenet::Frame;
+  using rpi_rt::logic::shufflenet::Conv2D;
+
+  Frame<float> input_frame(56, 56, 24);
+  Frame<float> output_frame(56, 56, 24);
+
+  Conv2D<float>::Params params(24, 1, 1, 24);
+  params.stride_width(1);
+  params.stride_height(1);
+
+  auto input_data = load_testdata("conv2d_input");
+  auto output_data = load_testdata("conv2d_output");
+  auto weight_data = load_testdata("conv2d_weight");
+  std::copy(input_data.begin(), input_data.end(), input_frame.data());
+  std::copy(weight_data.begin(), weight_data.end(), params.data());
+
+  std::cout << input_data[0] << std::endl;
+
+  Conv2D<float> conv2d;
+  conv2d.setup(input_frame, output_frame, params);
+  conv2d.forward();
+
+  CHECK(compare_result(output_frame.data(), output_data.data(), output_data.size()));
 }
 
 TEST_CASE("DepthwiseConv2d", "[shufflenet][kernels]") {
