@@ -187,13 +187,12 @@ public:
       throw std::runtime_error("xnn_reshape_convolution2d_nhwc_f32");
     }
 
-    workspace_.resize(workspace_size);
     assert(output_height == output.height());
     assert(output_width == output.width());
 
     status = xnn_setup_convolution2d_nhwc_f32(
         conv_op_,
-        workspace_.data(),
+        nullptr,
         input.data(),
         output.data());
     if (status != xnn_status_success) {
@@ -213,7 +212,6 @@ public:
 
 private:
   xnn_operator_t conv_op_ = nullptr;
-  std::vector<uint8_t> workspace_;
 };
 
 }

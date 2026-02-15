@@ -7,6 +7,8 @@
 
 #include "src/logic/shufflenet/frame.hpp"
 #include "src/logic/shufflenet/depthwise_conv2d.hpp"
+#include "src/logic/shufflenet/maxpool2d.hpp"
+#include "src/logic/shufflenet/global_average_pool2d.hpp"
 #include "src/logic/shufflenet/conv2d.hpp"
 #include "src/logic/shufflenet/branch1.hpp"
 #include "src/logic/shufflenet/branch2.hpp"
@@ -40,7 +42,53 @@ bool compare_result(const float* a, const float* b, size_t size, float eps = 0.0
   return max_error < eps;
 }
 
-TEST_CASE("Conv2d", "[shufflenet][kernels]") {
+TEST_CASE("Maxpool2D", "[shufflenet][kernels]") {
+  using rpi_rt::logic::shufflenet::Frame;
+  using rpi_rt::logic::shufflenet::Maxpool2D;
+
+  Frame<float> input_frame(112, 112, 24);
+  Frame<float> output_frame(56, 56, 24);
+
+  Maxpool2D<float>::Params params;
+  params.width(3);
+  params.height(3);
+  params.stride_width(2);
+  params.stride_height(2);
+  params.padding_width(1);
+  params.padding_height(1);
+  params.dilation_width(1);
+  params.dilation_height(1);
+
+  auto input_data = load_testdata("maxpool_input");
+  auto output_data = load_testdata("maxpool_output");
+  std::copy(input_data.begin(), input_data.end(), input_frame.data());
+
+  Maxpool2D<float> maxpool2d;
+  maxpool2d.setup(input_frame, output_frame, params);
+  maxpool2d.forward();
+
+  CHECK(compare_result(output_frame.data(), output_data.data(), output_data.size()));
+}
+
+TEST_CASE("GlobalAveragePool2D", "[shufflenet][kernels]") {
+  using rpi_rt::logic::shufflenet::Frame;
+  using rpi_rt::logic::shufflenet::GlobalAveragePool2D;
+
+  Frame<float> input_frame(7, 7, 64);
+  Frame<float> output_frame(1, 1, 64);
+
+  auto input_data = load_testdata("mean_input");
+  auto output_data = load_testdata("mean_output");
+  std::copy(input_data.begin(), input_data.end(), input_frame.data());
+
+  GlobalAveragePool2D<float> pool;
+  pool.setup(input_frame, output_frame);
+  pool.forward();
+
+  CHECK(compare_result(output_frame.data(), output_data.data(), output_data.size()));
+}
+
+TEST_CASE("Conv2D", "[shufflenet][kernels]") {
   using rpi_rt::logic::shufflenet::Frame;
   using rpi_rt::logic::shufflenet::Conv2D;
 
@@ -64,7 +112,7 @@ TEST_CASE("Conv2d", "[shufflenet][kernels]") {
   CHECK(compare_result(output_frame.data(), output_data.data(), output_data.size()));
 }
 
-TEST_CASE("FusedConv2dBatchNorm", "[shufflenet][kernels]") {
+TEST_CASE("FusedConv2DBatchNorm", "[shufflenet][kernels]") {
   using rpi_rt::logic::shufflenet::Frame;
   using rpi_rt::logic::shufflenet::Conv2D;
 
@@ -91,7 +139,7 @@ TEST_CASE("FusedConv2dBatchNorm", "[shufflenet][kernels]") {
   CHECK(compare_result(output_frame.data(), output_data.data(), output_data.size()));
 }
 
-TEST_CASE("FusedConv2dBatchNormRelu", "[shufflenet][kernels]") {
+TEST_CASE("FusedConv2DBatchNormRelu", "[shufflenet][kernels]") {
   using rpi_rt::logic::shufflenet::Frame;
   using rpi_rt::logic::shufflenet::Conv2D;
 
@@ -119,7 +167,7 @@ TEST_CASE("FusedConv2dBatchNormRelu", "[shufflenet][kernels]") {
   CHECK(compare_result(output_frame.data(), output_data.data(), output_data.size()));
 }
 
-TEST_CASE("DepthwiseConv2d", "[shufflenet][kernels]") {
+TEST_CASE("DepthwiseConv2D", "[shufflenet][kernels]") {
   using rpi_rt::logic::shufflenet::Frame;
   using rpi_rt::logic::shufflenet::DepthwiseConv2D;
 
