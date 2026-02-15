@@ -8,6 +8,7 @@
 #include "src/logic/shufflenet/frame.hpp"
 #include "src/logic/shufflenet/depthwise_conv2d.hpp"
 #include "src/logic/shufflenet/conv2d.hpp"
+#include "src/logic/shufflenet/branch1.hpp"
 #include "src/logic/shufflenet/branch2.hpp"
 
 #ifndef TESTDATA_PATH
@@ -140,6 +141,34 @@ TEST_CASE("DepthwiseConv2d", "[shufflenet][kernels]") {
   DepthwiseConv2D<float> conv2d;
   conv2d.setup(input_frame, output_frame, params);
   conv2d.forward();
+
+  CHECK(compare_result(output_frame.data(), output_data.data(), output_data.size()));
+}
+
+TEST_CASE("Branch1Demo", "[shufflenet][kernels]") {
+  using rpi_rt::logic::shufflenet::Frame;
+  using rpi_rt::logic::shufflenet::Branch1;
+
+  Frame<float> input_frame(56, 56, 24);
+  Frame<float> output_frame(28, 28, 24);
+
+  Branch1<float>::Params params(48, 24, 2);
+
+  auto w0 = load_testdata("demo_x1w0");
+  auto w1 = load_testdata("demo_x1w1");
+  auto b0 = load_testdata("demo_x1b0");
+  auto b1 = load_testdata("demo_x1b1");
+  auto input_data = load_testdata("demo_x1_input");
+  auto output_data = load_testdata("demo_x1_output");
+  std::copy(input_data.begin(), input_data.end(), input_frame.data());
+  std::copy(w0.begin(), w0.end(), params.data('w', '0'));
+  std::copy(w1.begin(), w1.end(), params.data('w', '1'));
+  std::copy(b0.begin(), b0.end(), params.data('b', '0'));
+  std::copy(b1.begin(), b1.end(), params.data('b', '1'));
+
+  Branch1<float> x1;
+  x1.setup(input_frame, output_frame, params);
+  x1.forward();
 
   CHECK(compare_result(output_frame.data(), output_data.data(), output_data.size()));
 }
