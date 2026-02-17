@@ -14,6 +14,7 @@
 #include "src/logic/shufflenet/branch1.hpp"
 #include "src/logic/shufflenet/branch2.hpp"
 #include "src/logic/shufflenet/inverted_residual.hpp"
+#include "src/logic/shufflenet/model.hpp"
 
 #ifndef TESTDATA_PATH
   #define TESTDATA_PATH "testdata"
@@ -350,5 +351,19 @@ TEST_CASE("InvertedResidualChunkingDemo", "[shufflenet][repeats]") {
   r.forward();
 
   CHECK(compare_result(output_frame.data(), output_data.data(), output_data.size()));
+}
+
+TEST_CASE("Model", "[shufflenet][model]") {
+  using rpi_rt::logic::shufflenet::Frame;
+  using rpi_rt::logic::shufflenet::Model;
+
+  Frame<float> input_frame(224, 224, 3);
+  Frame<float> output_frame(1, 1, 1);
+
+  Model<float>::Params params({4, 8, 4}, {24, 48, 96, 192, 64});
+
+  Model<float> m;
+  m.setup(input_frame, output_frame, params);
+  m.forward();
 }
 

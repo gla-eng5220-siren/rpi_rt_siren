@@ -31,6 +31,10 @@ public:
     }
 
     void resize(size_t output_feature, size_t input_feature, size_t stride) {
+      output_feature_ = output_feature;
+      input_feature_ = input_feature;
+      stride_ = stride;
+
       if (stride > 1) {
         branch1_params_.emplace(output_feature, input_feature, stride);
       } else {
@@ -73,7 +77,22 @@ public:
       return branch2_params_;
     }
 
+    const auto& output_feature() const noexcept {
+      return output_feature_;
+    }
+
+    const auto& input_feature() const noexcept {
+      return input_feature_;
+    }
+
+    const auto& stride() const noexcept {
+      return stride_;
+    }
+
   private:
+    size_t input_feature_ = 0;
+    size_t output_feature_ = 0;
+    size_t stride_ = 0;
     std::optional<typename Branch1<elem_t>::Params> branch1_params_ = std::nullopt;
     typename Branch2<elem_t>::Params branch2_params_;
   };
