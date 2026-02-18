@@ -1,5 +1,6 @@
 #pragma once
 
+#include <functional>
 #include <list>
 #include <optional>
 #include <stdexcept>
@@ -9,6 +10,7 @@
 #include <vector>
 #include <cmath>
 #include <cassert>
+#include <sstream>
 
 #include "conv2d.hpp"
 #include "maxpool2d.hpp"
@@ -29,6 +31,48 @@ public:
 
     Params(const std::vector<size_t>& stage_repeats, const std::vector<size_t>& output_channels) {
       resize(stage_repeats, output_channels);
+    }
+
+    void load(std::function<void (const std::string&, elem_t*, size_t)> load_fn) {
+      load_fn("c1w", conv_pre_.data(), conv_pre_.size());
+      load_fn("c1b", conv_pre_.bias().data(), conv_pre_.bias().size());
+      load_fn("c5w", conv_post_.data(), conv_post_.size());
+      load_fn("c5b", conv_post_.bias().data(), conv_post_.bias().size());
+      load_fn("fcw", fc_.data(), fc_.size());
+      load_fn("fcb", fc_.bias().data(), fc_.bias().size());
+
+      int stage_nr = 2;
+      for (auto& stage : stages_) {
+        int repeat_nr = 0;
+        for (auto& repeat : stage) {
+          std::ostringstream oss;
+          oss << "s" << stage_nr << "r" << repeat_nr;
+          std::string prefix = oss.str();
+
+          auto load_repeat_fn = [&prefix, &load_fn, &repeat](const std::string& suffix){
+            load_fn(prefix + "x" + suffix, repeat.data(suffix[0], suffix[1], suffix[2]), repeat.size(suffix[0], suffix[1], suffix[2]));
+          };
+
+          // branch1
+          if (repeat.has_branch1()) {
+            load_repeat_fn("1w0");
+            load_repeat_fn("1b0");
+            load_repeat_fn("1w1");
+            load_repeat_fn("1b1");
+          }
+
+          // branch2
+          load_repeat_fn("2w0");
+          load_repeat_fn("2b0");
+          load_repeat_fn("2w1");
+          load_repeat_fn("2b1");
+          load_repeat_fn("2w2");
+          load_repeat_fn("2b2");
+
+          repeat_nr++;
+        }
+        stage_nr++;
+      }
     }
 
     void resize(const std::vector<size_t>& stage_repeats, const std::vector<size_t>& output_channels) {
@@ -66,8 +110,11 @@ public:
       conv_post_.resize(output_channels[output_channels.size() - 1], 1, 1, output_channels[output_channels.size() - 2]);
       conv_post_.stride_width(1);
       conv_post_.stride_height(1);
+      conv_post_.add_bias();
+      conv_post_.relu(true);
 
       fc_.resize(1, output_channels[output_channels.size() - 1]);
+      fc_.add_bias();
     }
 
     const auto& conv_pre_params() const noexcept {

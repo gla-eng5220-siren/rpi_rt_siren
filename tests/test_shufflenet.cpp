@@ -1,5 +1,6 @@
 #include "catch2/catch_test_macros.hpp"
 #include <algorithm>
+#include <cstdlib>
 #include <fstream>
 #include <iterator>
 #include <string>
@@ -37,8 +38,8 @@ std::vector<float> load_testdata(std::string path) {
 bool compare_result(const float* a, const float* b, size_t size, float eps = 0.001) {
   float max_error = 0;
   for (size_t i = 0; i < size; i++) {
-    if (a[i] - b[i] > max_error) {
-      max_error = a[i] - b[i];
+    if (std::abs(a[i] - b[i]) > max_error) {
+      max_error = std::abs(a[i] - b[i]);
     }
   }
   return max_error < eps;
@@ -361,9 +362,24 @@ TEST_CASE("Model", "[shufflenet][model]") {
   Frame<float> output_frame(1, 1, 1);
 
   Model<float>::Params params({4, 8, 4}, {24, 48, 96, 192, 64});
+  params.load([](const std::string& name, float* data, size_t size){
+    std::cout << "Loading " << name << std::endl;
+    auto loaded = load_testdata("model/" + name);
+    assert(size == loaded.size());
+    std::copy(loaded.begin(), loaded.end(), data);
+  });
+
+  auto input = load_testdata("model_input");
+  auto output = load_testdata("model_output");
+  std::copy(input.begin(), input.end(), input_frame.data());
 
   Model<float> m;
   m.setup(input_frame, output_frame, params);
   m.forward();
+
+  float result = output_frame.data()[0];
+  std::cout << "Result: " << result << std::endl;
+
+  CHECK(std::abs(result - output[0]) < 0.01);
 }
 
