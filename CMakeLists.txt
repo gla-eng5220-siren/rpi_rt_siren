@@ -31,6 +31,7 @@ FetchContent_MakeAvailable(CImg)
 
 add_executable(demo_capture
   src/demo_capture.cpp
+  src/sensor/v4l2_camera.cpp
 )
 target_include_directories(demo_capture PRIVATE
   ${CMAKE_CURRENT_SOURCE_DIR}/include
