@@ -16,19 +16,21 @@
 #include "src/logic/shufflenet/branch2.hpp"
 #include "src/logic/shufflenet/inverted_residual.hpp"
 #include "src/logic/shufflenet/model.hpp"
+#include "src/logic/shufflenet/preprocess.hpp"
 
 #ifndef TESTDATA_PATH
   #define TESTDATA_PATH "testdata"
 #endif
 
-std::vector<float> load_testdata(std::string path) {
+template<class Elem = float>
+std::vector<Elem> load_testdata(std::string path) {
   std::ifstream ifs{std::string(TESTDATA_PATH) + "/" + path, std::ios::binary};
   ifs.unsetf(std::ios::skipws);
   ifs.seekg(0, std::ios::end);
-  auto size = ifs.tellg() / sizeof(float);
+  auto size = ifs.tellg() / sizeof(Elem);
   ifs.seekg(0, std::ios::beg);
 
-  std::vector<float> vec;
+  std::vector<Elem> vec;
   vec.resize(size);
 
   std::copy(std::istream_iterator<char>(ifs), std::istream_iterator<char>(), (char *)vec.data());
@@ -381,5 +383,23 @@ TEST_CASE("Model", "[shufflenet][model]") {
   std::cout << "Result: " << result << std::endl;
 
   CHECK(std::abs(result - output[0]) < 0.01);
+}
+
+TEST_CASE("Preprocess", "[shufflenet][preprocess]") {
+  using rpi_rt::logic::shufflenet::Frame;
+  using rpi_rt::logic::shufflenet::Preprocess;
+
+  Frame<uint8_t> input_frame(1275, 1920, 3);
+  Frame<float> output_frame(224, 224, 3);
+
+  auto input = load_testdata<uint8_t>("preprocess_input");
+  auto output = load_testdata("preprocess_output");
+  std::copy(input.begin(), input.end(), input_frame.data());
+
+  Preprocess prep;
+  prep.setup(input_frame, output_frame);
+  prep.forward();
+
+  CHECK(compare_result(output_frame.data(), output.data(), output.size(), 0.03));
 }
 
