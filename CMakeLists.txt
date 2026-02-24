@@ -45,5 +45,6 @@ target_link_libraries(demo_shufflenet PRIVATE
   JPEG::JPEG
 )
 
+enable_testing()
 add_subdirectory(tests)
 

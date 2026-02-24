@@ -23,6 +23,9 @@ foreach(test_src IN ITEMS ${TEST_SRCS})
     ${PROJECT_SOURCE_DIR}
     "${PROJECT_SOURCE_DIR}/include"
   )
+  target_compile_definitions(${test_target} PRIVATE
+    TESTDATA_PATH="${PROJECT_SOURCE_DIR}/testdata"
+  )
   target_link_libraries(${test_target} PUBLIC Catch2::Catch2WithMain
     Threads::Threads
     XNNPACK
