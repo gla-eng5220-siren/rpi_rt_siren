@@ -6,7 +6,7 @@
 #include <string>
 #include <iostream>
 
-#include "src/logic/shufflenet/frame.hpp"
+#include "frame.hpp"
 #include "src/logic/shufflenet/depthwise_conv2d.hpp"
 #include "src/logic/shufflenet/maxpool2d.hpp"
 #include "src/logic/shufflenet/fc.hpp"
@@ -48,7 +48,7 @@ bool compare_result(const float* a, const float* b, size_t size, float eps = 0.0
 }
 
 TEST_CASE("Maxpool2D", "[shufflenet][kernels]") {
-  using rpi_rt::logic::shufflenet::Frame;
+  using rpi_rt::Frame;
   using rpi_rt::logic::shufflenet::Maxpool2D;
 
   Frame<float> input_frame(112, 112, 24);
@@ -76,7 +76,7 @@ TEST_CASE("Maxpool2D", "[shufflenet][kernels]") {
 }
 
 TEST_CASE("GlobalAveragePool2D", "[shufflenet][kernels]") {
-  using rpi_rt::logic::shufflenet::Frame;
+  using rpi_rt::Frame;
   using rpi_rt::logic::shufflenet::GlobalAveragePool2D;
 
   Frame<float> input_frame(7, 7, 64);
@@ -94,7 +94,7 @@ TEST_CASE("GlobalAveragePool2D", "[shufflenet][kernels]") {
 }
 
 TEST_CASE("Fc", "[shufflenet][kernels]") {
-  using rpi_rt::logic::shufflenet::Frame;
+  using rpi_rt::Frame;
   using rpi_rt::logic::shufflenet::Fc;
 
   Frame<float> input_frame(1, 1, 64);
@@ -119,7 +119,7 @@ TEST_CASE("Fc", "[shufflenet][kernels]") {
 }
 
 TEST_CASE("Conv2D", "[shufflenet][kernels]") {
-  using rpi_rt::logic::shufflenet::Frame;
+  using rpi_rt::Frame;
   using rpi_rt::logic::shufflenet::Conv2D;
 
   Frame<float> input_frame(56, 56, 24);
@@ -143,7 +143,7 @@ TEST_CASE("Conv2D", "[shufflenet][kernels]") {
 }
 
 TEST_CASE("FusedConv2DBatchNorm", "[shufflenet][kernels]") {
-  using rpi_rt::logic::shufflenet::Frame;
+  using rpi_rt::Frame;
   using rpi_rt::logic::shufflenet::Conv2D;
 
   Frame<float> input_frame(56, 56, 24);
@@ -170,7 +170,7 @@ TEST_CASE("FusedConv2DBatchNorm", "[shufflenet][kernels]") {
 }
 
 TEST_CASE("FusedConv2DBatchNormRelu", "[shufflenet][kernels]") {
-  using rpi_rt::logic::shufflenet::Frame;
+  using rpi_rt::Frame;
   using rpi_rt::logic::shufflenet::Conv2D;
 
   Frame<float> input_frame(56, 56, 24);
@@ -198,7 +198,7 @@ TEST_CASE("FusedConv2DBatchNormRelu", "[shufflenet][kernels]") {
 }
 
 TEST_CASE("DepthwiseConv2D", "[shufflenet][kernels]") {
-  using rpi_rt::logic::shufflenet::Frame;
+  using rpi_rt::Frame;
   using rpi_rt::logic::shufflenet::DepthwiseConv2D;
 
   Frame<float> input_frame(56, 56, 24);
@@ -224,7 +224,7 @@ TEST_CASE("DepthwiseConv2D", "[shufflenet][kernels]") {
 }
 
 TEST_CASE("Branch1Demo", "[shufflenet][branchs]") {
-  using rpi_rt::logic::shufflenet::Frame;
+  using rpi_rt::Frame;
   using rpi_rt::logic::shufflenet::Branch1;
 
   Frame<float> input_frame(56, 56, 24);
@@ -252,7 +252,7 @@ TEST_CASE("Branch1Demo", "[shufflenet][branchs]") {
 }
 
 TEST_CASE("Branch2Demo", "[shufflenet][branchs]") {
-  using rpi_rt::logic::shufflenet::Frame;
+  using rpi_rt::Frame;
   using rpi_rt::logic::shufflenet::Branch2;
 
   Frame<float> input_frame(56, 56, 24);
@@ -284,7 +284,7 @@ TEST_CASE("Branch2Demo", "[shufflenet][branchs]") {
 }
 
 TEST_CASE("InvertedResidualDemo", "[shufflenet][repeats]") {
-  using rpi_rt::logic::shufflenet::Frame;
+  using rpi_rt::Frame;
   using rpi_rt::logic::shufflenet::InvertedResidual;
 
   Frame<float> input_frame(56, 56, 24);
@@ -324,7 +324,7 @@ TEST_CASE("InvertedResidualDemo", "[shufflenet][repeats]") {
 }
 
 TEST_CASE("InvertedResidualChunkingDemo", "[shufflenet][repeats]") {
-  using rpi_rt::logic::shufflenet::Frame;
+  using rpi_rt::Frame;
   using rpi_rt::logic::shufflenet::InvertedResidual;
 
   Frame<float> input_frame(28, 28, 48);
@@ -357,7 +357,7 @@ TEST_CASE("InvertedResidualChunkingDemo", "[shufflenet][repeats]") {
 }
 
 TEST_CASE("Model", "[shufflenet][model]") {
-  using rpi_rt::logic::shufflenet::Frame;
+  using rpi_rt::Frame;
   using rpi_rt::logic::shufflenet::Model;
 
   Frame<float> input_frame(224, 224, 3);
@@ -386,7 +386,7 @@ TEST_CASE("Model", "[shufflenet][model]") {
 }
 
 TEST_CASE("Preprocess", "[shufflenet][preprocess]") {
-  using rpi_rt::logic::shufflenet::Frame;
+  using rpi_rt::Frame;
   using rpi_rt::logic::shufflenet::Preprocess;
 
   Frame<uint8_t> input_frame(1275, 1920, 3);

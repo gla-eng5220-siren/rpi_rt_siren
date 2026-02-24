@@ -17,13 +17,7 @@ set(XNNPACK_BUILD_BENCHMARKS OFF CACHE BOOL "" FORCE)
 
 FetchContent_MakeAvailable(XNNPACK)
 
-FetchContent_Declare(
-    CImg
-    GIT_REPOSITORY https://github.com/GreycLab/CImg.git
-    GIT_TAG v.3.7.0
-)
-
-FetchContent_MakeAvailable(CImg)
+find_package(JPEG REQUIRED)
 
 add_executable(demo_siren
   src/demo_siren.cpp
@@ -37,16 +31,18 @@ target_link_libraries(demo_siren PRIVATE
   Threads::Threads
 )
 
-add_executable(demo_xnnpack
-  src/demo_xnnpack.cpp
+add_executable(demo_shufflenet
+  src/demo_shufflenet.cpp
+  src/logic/shufflenet.cpp
+  src/misc/jpeg_utils.cpp
 )
-target_include_directories(demo_xnnpack PRIVATE
+target_include_directories(demo_shufflenet PRIVATE
   ${CMAKE_CURRENT_SOURCE_DIR}/include
-  ${cimg_SOURCE_DIR}
 )
-target_link_libraries(demo_xnnpack PRIVATE
+target_link_libraries(demo_shufflenet PRIVATE
   Threads::Threads
   XNNPACK
+  JPEG::JPEG
 )
 
 add_subdirectory(tests)

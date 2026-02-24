@@ -21,7 +21,7 @@ foreach(test_src IN ITEMS ${TEST_SRCS})
 	add_executable(${test_target} ${test_src})
   target_include_directories(${test_target} PRIVATE
     ${PROJECT_SOURCE_DIR}
-    ${cimg_SOURCE_DIR}
+    "${PROJECT_SOURCE_DIR}/include"
   )
   target_link_libraries(${test_target} PUBLIC Catch2::Catch2WithMain
     Threads::Threads

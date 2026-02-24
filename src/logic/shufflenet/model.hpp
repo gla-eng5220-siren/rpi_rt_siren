@@ -17,6 +17,7 @@
 #include "global_average_pool2d.hpp"
 #include "inverted_residual.hpp"
 #include "frame.hpp"
+#include "fc.hpp"
 
 namespace rpi_rt::logic::shufflenet {
 

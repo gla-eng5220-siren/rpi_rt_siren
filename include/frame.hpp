@@ -2,7 +2,7 @@
 
 #include <vector>
 
-namespace rpi_rt::logic::shufflenet {
+namespace rpi_rt {
 
 // assumes NHWC and N == 1
 // alwasys use a compact mem layout
@@ -55,6 +55,11 @@ private:
   size_t channels_ = 0;
   std::vector<elem_t> buffer_;
 };
+
+namespace jpeg_utils {
+  Frame<uint8_t> read_from_file(const std::string& filename);
+  void write_to_file(const Frame<uint8_t>& frame, const std::string& file);
+}
 
 }
 
