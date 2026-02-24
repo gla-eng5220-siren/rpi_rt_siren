@@ -182,8 +182,8 @@ namespace rpi_rt {
       void invoke_callback(const mmap_buffer_t& buffer) {
         Frame<uint8_t> frame{height_, width_, 3};
 
-        assert(buffer.size == frame.size());
-        std::memcpy(frame.data(), buffer.data, buffer.size);
+        assert(buffer.size >= frame.size());
+        std::memcpy(frame.data(), buffer.data, frame.size());
         callback_(std::move(frame));
       }
 
