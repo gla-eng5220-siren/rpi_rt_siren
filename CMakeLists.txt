@@ -64,3 +64,19 @@ target_link_libraries(demo_capture PRIVATE
   JPEG::JPEG
 )
 
+add_executable(flame_iris
+  src/flame_iris.cpp
+  src/sensor/v4l2_camera.cpp
+  src/logic/shufflenet.cpp
+  src/misc/jpeg_utils.cpp
+)
+target_include_directories(flame_iris PRIVATE
+  ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
+target_link_libraries(flame_iris PRIVATE
+  Threads::Threads
+  XNNPACK
+  PkgConfig::LibV4l2
+  JPEG::JPEG
+)
+
