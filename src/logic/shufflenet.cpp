@@ -22,12 +22,13 @@ namespace rpi_rt {
         model_params_.load([&model_path](const std::string& name, float* data, size_t size){
             read_param_file(model_path + "/" + name, data, size);
         });
+
+        prep_.setup(prep_buffer_);
         model_.setup(prep_buffer_, output_buffer_, model_params_);
       }
 
       virtual float process(const Frame<uint8_t>& frame) override {
-        prep_.setup(frame, prep_buffer_);
-        prep_.forward();
+        prep_.process(frame);
         model_.forward();
         return output_buffer_.data()[0];
       }
