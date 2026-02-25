@@ -397,8 +397,8 @@ TEST_CASE("Preprocess", "[shufflenet][preprocess]") {
   std::copy(input.begin(), input.end(), input_frame.data());
 
   Preprocess prep;
-  prep.setup(input_frame, output_frame);
-  prep.forward();
+  prep.setup(output_frame);
+  prep.process(input_frame);
 
   CHECK(compare_result(output_frame.data(), output.data(), output.size(), 0.03));
 }

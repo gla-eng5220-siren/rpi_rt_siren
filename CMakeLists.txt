@@ -18,6 +18,8 @@ set(XNNPACK_BUILD_BENCHMARKS OFF CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(XNNPACK)
 
 find_package(JPEG REQUIRED)
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(LibV4l2 REQUIRED IMPORTED_TARGET GLOBAL libv4l2)
 
 add_executable(demo_siren
   src/demo_siren.cpp
@@ -47,4 +49,34 @@ target_link_libraries(demo_shufflenet PRIVATE
 
 enable_testing()
 add_subdirectory(tests)
+
+add_executable(demo_capture
+  src/demo_capture.cpp
+  src/sensor/v4l2_camera.cpp
+  src/misc/jpeg_utils.cpp
+)
+target_include_directories(demo_capture PRIVATE
+  ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
+target_link_libraries(demo_capture PRIVATE
+  Threads::Threads
+  PkgConfig::LibV4l2
+  JPEG::JPEG
+)
+
+add_executable(flame_iris
+  src/flame_iris.cpp
+  src/sensor/v4l2_camera.cpp
+  src/logic/shufflenet.cpp
+  src/misc/jpeg_utils.cpp
+)
+target_include_directories(flame_iris PRIVATE
+  ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
+target_link_libraries(flame_iris PRIVATE
+  Threads::Threads
+  XNNPACK
+  PkgConfig::LibV4l2
+  JPEG::JPEG
+)
 

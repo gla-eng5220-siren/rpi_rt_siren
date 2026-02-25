@@ -27,12 +27,10 @@ public:
   Preprocess& operator=(const Preprocess&) = delete;
   Preprocess& operator=(Preprocess&&) = delete;
 
-  void setup(const Frame<uint8_t>& input, Frame<float>& output) {
-
+  void setup(Frame<float>& output) {
     (void)XNNPackGuard::instance();
 
-    assert(input.channels() == channels);
-    assert(input.channels() == output.channels());
+    assert(output.channels() == channels);
     assert(output.width() == small_size);
     assert(output.height() == small_size);
     resize_output_.resize(small_size, small_size, channels);
@@ -48,6 +46,15 @@ public:
     if (status != xnn_status_success) {
       throw std::runtime_error("xnn_create_resize_bilinear2d_nhwc");
     }
+
+    output_ptr_ = output.data();
+  }
+
+  void process(const Frame<uint8_t>& input) {
+    (void)XNNPackGuard::instance();
+    assert(input.channels() == channels);
+
+    xnn_status status;
 
     size_t workspace_size;
     status = xnn_reshape_resize_bilinear2d_nhwc(
@@ -73,13 +80,6 @@ public:
       throw std::runtime_error("xnn_setup_resize_bilinear2d_nhwc");
     }
 
-    output_ptr_ = output.data();
-  }
-
-  void forward() {
-    (void)XNNPackGuard::instance();
-
-    xnn_status status;
     status = xnn_run_operator(resize_op_, nullptr);
     if (status != xnn_status_success) {
       throw std::runtime_error("xnn_run_operator(resize_bilinear2d_nhwc)");
@@ -104,7 +104,6 @@ public:
   Frame<uint8_t> resize_output_;
 private:
   xnn_operator_t resize_op_ = nullptr;
-  xnn_operator_t convert_op_ = nullptr;
   float* output_ptr_ = nullptr;
 
   constexpr static size_t small_size = 224;
