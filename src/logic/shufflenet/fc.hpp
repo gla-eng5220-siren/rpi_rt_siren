@@ -15,6 +15,12 @@
 
 namespace rpi_rt::logic::shufflenet {
 
+/*
+ Fully Connected layer (also known as a Dense or Linear layer). It is one of the most
+ fundamental building blocks in neural networks.
+
+ Assumes NHWC compact layout.
+ */
 template <class Elem>
 class Fc {
 public:
