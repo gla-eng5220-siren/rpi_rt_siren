@@ -15,6 +15,13 @@
 
 namespace rpi_rt::logic::shufflenet {
 
+/*
+ Global Average Pooling (GAP) is a layer used in convolutional neural
+ networks (CNNs) that reduces each feature map to a single number by
+ taking the average of all its values.
+
+ Assumes NHWC compact memory layout.
+ */
 template <class Elem>
 class GlobalAveragePool2D {
 public:
