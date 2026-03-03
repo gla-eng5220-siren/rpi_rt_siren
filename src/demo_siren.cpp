@@ -8,7 +8,7 @@ int main(void) {
   auto sensor = rpi_rt::create_mock_temperature_sensor();
 
   sensor->set_celsius_reciever([&alarm](float degrees) {
-    std::cout << "We got a celsius degree: " << degrees << std::endl;
+    std::cout << "Temperature in degree celcius:  " << degrees << std::endl;
     if (degrees > 200.0f) {
       alarm->report_fire();
     }
