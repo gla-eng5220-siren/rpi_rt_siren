@@ -14,7 +14,18 @@
 #include "frame.hpp"
 
 namespace rpi_rt::logic::shufflenet {
+/*
+Conv2D operator (2D convolution) backed by XNNPACK.
 
+- Layout: assumes NHWC (N == 1) with compact/contiguous memory (Frame<Elem>).
+- Data type: fp32 only (Elem must be float).
+- Weights layout: (out_channels, kernel_h, kernel_w, in_channels).
+- Supports: stride, padding, optional bias, and optional fused ReLU
+  (implemented via output_min/output_max when creating the XNNPACK operator).
+- Usage pattern:
+    1) setup(input, output, params)  -> create/reshape/setup XNNPACK operator
+    2) forward()                     -> run the operator
+*/
 template <class Elem>
 class Conv2D {
 public:
