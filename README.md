@@ -1,4 +1,7 @@
-# ![FlameIris Logo](/imgs/logo.png) FlameIris: End-to-end Vision-led Real-time Fire Detection and Alarming
+<p align="center"><img src="/imgs/logo.png" height="250"></p>
+
+
+# FlameIris: End-to-end Vision-led Real-time Fire Detection and Alarming
 
 **WARNING**: Development is actively in process as part of a course project. Some functions are incomplete and still in development.
 
@@ -57,5 +60,5 @@ A few caveats (temporarily):
 
 ## Affiliation
 
-![UofG Logo](/imgs/uofg_logo.png)
+<p align="center"><img src="/imgs/uofg_logo.png" height="200"></p>
 
