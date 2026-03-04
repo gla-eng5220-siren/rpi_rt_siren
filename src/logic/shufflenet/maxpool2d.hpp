@@ -15,6 +15,18 @@
 
 namespace rpi_rt::logic::shufflenet {
 
+/*
+MaxPool2D operator (2D max pooling) backed by XNNPACK.
+
+- Purpose: downsample feature maps by taking the maximum value in each pooling window.
+- Layout: assumes NHWC (N == 1) with compact/contiguous memory (Frame<Elem>).
+- Data type: fp32 only (Elem must be float). (See static_assert in the implementation.)
+- Parameters: input width/height and pooling kernel size (see Params setters).
+- Usage pattern:
+    1) setup(input, output, params)  -> create/reshape/setup XNNPACK operator
+    2) forward()                     -> run the operator
+*/
+
 template <class Elem>
 class Maxpool2D {
 public:
