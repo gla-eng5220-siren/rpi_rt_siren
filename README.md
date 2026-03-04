@@ -1,4 +1,4 @@
-# FlameIris: End-to-end Vision-led Real-time Fire Detection and Alarming
+# ![FlameIris Logo](/imgs/logo.png) FlameIris: End-to-end Vision-led Real-time Fire Detection and Alarming
 
 **WARNING**: Development is actively in process as part of a course project. Some functions are incomplete and still in development.
 
@@ -54,4 +54,8 @@ A few caveats (temporarily):
 
 * A working webcam is expected at /dev/video0
 * For now, the program will continuously output detection results to stdout. We will support the buzzer and sound alarm in the future.
+
+## Affiliation
+
+![UofG Logo](/imgs/uofg_logo.png)
 
