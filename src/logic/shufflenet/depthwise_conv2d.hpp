@@ -168,18 +168,20 @@ public:
         -INFINITY, INFINITY,
         0,
         nullptr,
+        nullptr,
         &conv_op_);
     if (status != xnn_status_success) {
       throw std::runtime_error("xnn_create_convolution2d_nhwc_f32");
     }
 
-    size_t workspace_size, output_height, output_width;
+    size_t workspace_size, workspace_alignment, output_height, output_width;
     status = xnn_reshape_convolution2d_nhwc_f32(
         conv_op_,
         1,
         input.height(),
         input.width(),
         &workspace_size,
+        &workspace_alignment,
         &output_height,
         &output_width,
         nullptr);

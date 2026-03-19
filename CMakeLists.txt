@@ -4,18 +4,56 @@ project(rpi_rt)
 set(CMAKE_CXX_STANDARD 17)
 find_package(Threads)
 
-include(FetchContent)
+option(USE_SYSTEM_XNNPACK "Use system-installed XNNPACK" ON)
 
-FetchContent_Declare(
-  XNNPACK
-  GIT_REPOSITORY https://github.com/google/XNNPACK.git
-  GIT_TAG 810b9afd9a293f84be15185e0e35dcfab4f596c7 
-)
+if(USE_SYSTEM_XNNPACK)
+  find_path(XNNPACK_INCLUDE_DIR
+    NAMES xnnpack.h
+    PATHS /usr/include /usr/local/include
+  )
 
-set(XNNPACK_BUILD_TESTS OFF CACHE BOOL "" FORCE)
-set(XNNPACK_BUILD_BENCHMARKS OFF CACHE BOOL "" FORCE)
+  find_library(XNNPACK_LIBRARY
+    NAMES XNNPACK
+    PATHS
+    /usr/lib
+    /usr/lib/aarch64-linux-gnu
+    /usr/local/lib
+    /usr/lib64
+    /usr/lib64/aarch64-linux-gnu
+    /usr/local/lib64
+  )
 
-FetchContent_MakeAvailable(XNNPACK)
+  if(XNNPACK_INCLUDE_DIR AND XNNPACK_LIBRARY)
+    add_library(XNNPACK::XNNPACK UNKNOWN IMPORTED)
+
+    set_target_properties(XNNPACK::XNNPACK PROPERTIES
+      IMPORTED_LOCATION ${XNNPACK_LIBRARY}
+      INTERFACE_INCLUDE_DIRECTORIES ${XNNPACK_INCLUDE_DIR}
+    )
+    message(STATUS "Using system XNNPACK")
+
+    # TODO check functions we use
+  else()
+    message(WARNING "System XNNPACK not found, falling back")
+    set(USE_SYSTEM_XNNPACK OFF)
+  endif()
+endif()
+
+if(NOT USE_SYSTEM_XNNPACK)
+  include(FetchContent)
+
+  FetchContent_Declare(
+    XNNPACK
+    GIT_REPOSITORY https://github.com/google/XNNPACK.git
+    GIT_TAG 810b9afd9a293f84be15185e0e35dcfab4f596c7 
+  )
+
+  set(XNNPACK_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+  set(XNNPACK_BUILD_BENCHMARKS OFF CACHE BOOL "" FORCE)
+
+  FetchContent_MakeAvailable(XNNPACK)
+endif()
+
 
 find_package(JPEG REQUIRED)
 find_package(PkgConfig REQUIRED)

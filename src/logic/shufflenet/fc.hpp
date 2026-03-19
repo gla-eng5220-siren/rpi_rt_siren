@@ -129,6 +129,7 @@ public:
         -INFINITY, INFINITY,
         0,
         nullptr,
+        nullptr,
         &fc_op_);
     if (status != xnn_status_success) {
       throw std::runtime_error("xnn_create_fully_connected_nc_f32");
