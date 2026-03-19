@@ -1,13 +1,28 @@
 Include(FetchContent)
 include(CTest)
 
-FetchContent_Declare(
-  Catch2
-  GIT_REPOSITORY https://github.com/catchorg/Catch2.git
-  GIT_TAG        v3.8.1 # or a later release
-)
+option(USE_SYSTEM_CATCH2 "Use system-installed Catch2" ON)
 
-FetchContent_MakeAvailable(Catch2)
+if(USE_SYSTEM_CATCH2)
+  find_package(Catch2 3.7.1 QUIET)
+
+  if(NOT Catch2_FOUND)
+    message(STATUS "System Catch2 not found, falling back to FetchContent")
+    set(USE_SYSTEM_CATCH2 OFF)
+  endif()
+endif()
+
+if(NOT USE_SYSTEM_CATCH2)
+  include(FetchContent)
+
+  FetchContent_Declare(
+    Catch2
+    GIT_REPOSITORY https://github.com/catchorg/Catch2.git
+    GIT_TAG        v3.7.1 # or newer
+  )
+
+  FetchContent_MakeAvailable(Catch2)
+endif()
 
 include(Catch)
 
