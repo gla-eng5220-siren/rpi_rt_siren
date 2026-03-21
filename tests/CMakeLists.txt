@@ -7,7 +7,7 @@ if(USE_SYSTEM_CATCH2)
   find_package(Catch2 3.7.1 QUIET)
 
   if(NOT Catch2_FOUND)
-    message(STATUS "System Catch2 not found, falling back to FetchContent")
+    message(WARNING "System Catch2 not found, falling back to FetchContent")
     set(USE_SYSTEM_CATCH2 OFF)
   endif()
 endif()
@@ -43,7 +43,7 @@ foreach(test_src IN ITEMS ${TEST_SRCS})
   )
   target_link_libraries(${test_target} PUBLIC Catch2::Catch2WithMain
     Threads::Threads
-    XNNPACK
+    XNNPACK::XNNPACK
   )
   catch_discover_tests(${test_target})
 endforeach()
