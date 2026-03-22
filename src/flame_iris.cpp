@@ -1,6 +1,7 @@
 #include "frame.hpp"
 #include "sensor.hpp"
 #include "logic.hpp"
+#include "http_server.hpp"
 
 #include <sstream>
 #include <thread>
@@ -16,9 +17,17 @@ int main(void) {
   auto model = rpi_rt::create_shufflenet_model();
   model->setup(model_path);
 
-  sensor->set_frame_callback([&model](rpi_rt::Frame<uint8_t> frame) {
+  auto server = rpi_rt::create_http_server();
+
+  server->setup();
+
+  sensor->set_frame_callback([&model, &server](rpi_rt::Frame<uint8_t> frame) {
+    server->set_cam_frame(frame);
+
     float result = model->process(frame);
     std::cout << "Result : " << result;
+
+    server->set_logit(result);
 
     if (result > 0) {
       std::cout << "(NO FIRE)" << std::endl;
@@ -29,6 +38,10 @@ int main(void) {
 
   std::thread sensor_thread([self = sensor](){
     self->run();
+  });
+
+  std::thread server_thread([self = server](){
+    self->run("0.0.0.0", 8080);
   });
 
   for (;;) {

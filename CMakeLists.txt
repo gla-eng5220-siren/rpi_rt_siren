@@ -59,6 +59,7 @@ add_executable(flame_iris
   src/sensor/v4l2_camera.cpp
   src/logic/shufflenet.cpp
   src/misc/jpeg_utils.cpp
+  src/http_server/http_server.cpp
 )
 target_include_directories(flame_iris PRIVATE
   ${CMAKE_CURRENT_SOURCE_DIR}/include
