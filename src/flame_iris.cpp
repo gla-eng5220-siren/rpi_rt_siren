@@ -1,5 +1,6 @@
 #include "alarm.hpp"
 #include "frame.hpp"
+#include "http_server.hpp"
 #include "sensor.hpp"
 #include "logic.hpp"
 #include "thread_actor.hpp"
@@ -10,6 +11,8 @@
 #include <stdexcept>
 #include <thread>
 #include <iostream>
+
+static std::shared_ptr<rpi_rt::http_server_t> webui;
 
 auto make_vision_logic(const argparse::ArgumentParser& program) {
   auto model = rpi_rt::create_shufflenet_model();
@@ -31,6 +34,9 @@ auto make_vision_thread(
     rpi_rt::camera_sensor_t, rpi_rt::visual_classify_logic_t>>();
   v_thread->set_sensor(sensor);
   v_thread->set_logic(logic);
+  if (webui) {
+    v_thread->set_http_server(webui);
+  }
   return v_thread;
 }
 
@@ -95,19 +101,43 @@ int main(int argc, char** argv) {
     .help("Logit threshold for vistual detection")
     .default_value(0.0f)
     .scan<'g', float>();
+  program.add_argument("--webui-path")
+    .help("Path to webui static files (e.g. webui)");
+  program.add_argument("--webui-host")
+    .default_value("127.0.0.1")
+    .help("Webui listening host");
+  program.add_argument("--webui-port")
+    .scan<'i', int>()
+    .default_value(8383)
+    .help("Webui listening port");
 
   program.parse_args(argc, argv);
 
+  if (program.present("--webui-path")) {
+    webui = rpi_rt::create_http_server();
+    webui->setup(program.get<std::string>("--webui-path"));
+  }
+
   auto sensor_logic_thread = make_sensor_logic_thread(program);
   auto alarm_thread = make_alarm_thread(program);
-
-  sensor_logic_thread->run();
-  alarm_thread->run();
 
   sensor_logic_thread->set_detection_result_callback([&alarm_thread](
         std::unique_ptr<rpi_rt::detection_result_t> result) {
     alarm_thread->report(std::move(result));
   });
+
+  std::thread webui_thread;
+  if (webui) {
+    auto host = program.get<std::string>("--webui-host");
+    auto port = program.get<int>("--webui-port");
+    webui_thread = std::thread([self = webui, host, port](){
+      std::cout << "[WebUI] Listening on http://" << host << ":" << port << std::endl;
+      self->run(host, port);
+    });
+  }
+
+  sensor_logic_thread->run();
+  alarm_thread->run();
 
   for (;;) {
     std::this_thread::sleep_for(std::chrono::seconds{10});
@@ -115,6 +145,11 @@ int main(int argc, char** argv) {
 
   sensor_logic_thread->close();
   alarm_thread->close();
+
+  if (webui) {
+    webui->close();
+    webui_thread.join();
+  }
   return 0;
 }
 

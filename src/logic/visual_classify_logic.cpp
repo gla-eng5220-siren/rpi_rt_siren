@@ -37,6 +37,7 @@ namespace rpi_rt {
     float logit = model_->process(frame);
     auto result = std::make_unique<visual_detection_result>(
         logit, logit_threshold_);
+    last_logit_ = logit;
     callback_(std::move(result));
   }
 }

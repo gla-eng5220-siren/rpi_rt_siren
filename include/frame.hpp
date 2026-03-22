@@ -61,6 +61,7 @@ private:
 namespace jpeg_utils {
   Frame<uint8_t> read_from_file(const std::string& filename);
   void write_to_file(const Frame<uint8_t>& frame, const std::string& file);
+  std::vector<uint8_t> write_to_mem(const Frame<uint8_t>& frame);
 }
 
 }

@@ -25,6 +25,7 @@ add_executable(flame_iris
   src/misc/jpeg_utils.cpp
   src/sensor/mock_temperature_sensor.cpp
   src/alarm/stdout_alarm.cpp
+  src/http_server/http_server.cpp
 )
 target_include_directories(flame_iris PRIVATE
   ${CMAKE_CURRENT_SOURCE_DIR}/include

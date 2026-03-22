@@ -39,8 +39,13 @@ namespace rpi_rt {
 
       void process(const Frame<uint8_t>& frame);
 
+      float last_logit() const noexcept {
+        return last_logit_;
+      }
+
     private:
       float logit_threshold_ = 0.0;
+      float last_logit_ = 0.0;
       std::shared_ptr<visual_classfying_model_t> model_;
       std::function<void (std::unique_ptr<detection_result_t>)> callback_;
   };
@@ -60,7 +65,7 @@ namespace rpi_rt {
         callback_ = callback;
       }
 
-      virtual void process(float);
+      void process(float);
 
     private:
       float celsius_threshold_ = 0.0;

@@ -44,18 +44,16 @@ Frame<uint8_t> read_from_file(const std::string& filename) {
   return frame;
 }
 
-void write_to_file(const Frame<uint8_t>& frame, const std::string& filename) {
-  FILE *fp = fopen(filename.c_str(), "wb");
-  if (!fp) {
-    throw std::runtime_error("cannot open file");
-  }
+namespace detail {
 
+template <class Callable>
+void write_jpeg_to(const Frame<uint8_t>& frame, Callable libjpeg_dest_setup) {
   jpeg_compress_struct cinfo;
   jpeg_error_mgr jerr;
 
   cinfo.err = jpeg_std_error(&jerr);
   jpeg_create_compress(&cinfo);
-  jpeg_stdio_dest(&cinfo, fp);
+  libjpeg_dest_setup(&cinfo);
 
   cinfo.image_width = frame.width();
   cinfo.image_height = frame.height();
@@ -73,7 +71,32 @@ void write_to_file(const Frame<uint8_t>& frame, const std::string& filename) {
 
   jpeg_finish_compress(&cinfo);
   jpeg_destroy_compress(&cinfo);
+}
+
+}
+
+void write_to_file(const Frame<uint8_t>& frame, const std::string& filename) {
+  FILE *fp = fopen(filename.c_str(), "wb");
+  if (!fp) {
+    throw std::runtime_error("cannot open file");
+  }
+
+  detail::write_jpeg_to(frame, [&fp](jpeg_compress_struct *cinfo) {
+    jpeg_stdio_dest(cinfo, fp);
+  });
   fclose(fp);
+}
+
+std::vector<uint8_t> write_to_mem(const Frame<uint8_t>& frame) {
+  unsigned char* buf = nullptr;
+  unsigned long bufsz = 0;
+
+  detail::write_jpeg_to(frame, [&buf, &bufsz](jpeg_compress_struct *cinfo) {
+    jpeg_mem_dest(cinfo, &buf, &bufsz);
+  });
+  std::vector<uint8_t> result(buf, buf + bufsz);
+  free(buf);
+  return result;
 }
 
 }
