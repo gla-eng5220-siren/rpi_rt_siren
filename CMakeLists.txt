@@ -1,22 +1,12 @@
 cmake_minimum_required(VERSION 3.12)
 project(rpi_rt)
-
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 set(CMAKE_CXX_STANDARD 17)
+
+option(USE_SYSTEM_XNNPACK "Use system-installed XNNPACK" ON)
+
+include(EnsureXNNPACK) # provides XNNPACK::XNNPACK
 find_package(Threads)
-
-include(FetchContent)
-
-FetchContent_Declare(
-  XNNPACK
-  GIT_REPOSITORY https://github.com/google/XNNPACK.git
-  GIT_TAG 810b9afd9a293f84be15185e0e35dcfab4f596c7 
-)
-
-set(XNNPACK_BUILD_TESTS OFF CACHE BOOL "" FORCE)
-set(XNNPACK_BUILD_BENCHMARKS OFF CACHE BOOL "" FORCE)
-
-FetchContent_MakeAvailable(XNNPACK)
-
 find_package(JPEG REQUIRED)
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(LibV4l2 REQUIRED IMPORTED_TARGET GLOBAL libv4l2)
@@ -75,7 +65,7 @@ target_include_directories(flame_iris PRIVATE
 )
 target_link_libraries(flame_iris PRIVATE
   Threads::Threads
-  XNNPACK
+  XNNPACK::XNNPACK
   PkgConfig::LibV4l2
   JPEG::JPEG
 )

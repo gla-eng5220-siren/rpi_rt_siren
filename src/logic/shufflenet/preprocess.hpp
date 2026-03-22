@@ -37,14 +37,13 @@ public:
 
     xnn_status status;
 
-    status = xnn_create_resize_bilinear2d_nhwc(
-        xnn_datatype_quint8,
+    status = xnn_create_resize_bilinear2d_nhwc_u8(
         small_size,
         small_size,
         0,
         &resize_op_);
     if (status != xnn_status_success) {
-      throw std::runtime_error("xnn_create_resize_bilinear2d_nhwc");
+      throw std::runtime_error("xnn_create_resize_bilinear2d_nhwc_u8");
     }
 
     output_ptr_ = output.data();
@@ -56,8 +55,8 @@ public:
 
     xnn_status status;
 
-    size_t workspace_size;
-    status = xnn_reshape_resize_bilinear2d_nhwc(
+    size_t workspace_size, workspace_alignment;
+    status = xnn_reshape_resize_bilinear2d_nhwc_u8(
         resize_op_,
         1,
         input.height(),
@@ -66,18 +65,19 @@ public:
         channels,
         channels,
         &workspace_size,
+        &workspace_alignment,
         nullptr);
     if (status != xnn_status_success) {
-      throw std::runtime_error("xnn_reshape_resize_bilinear2d_nhwc");
+      throw std::runtime_error("xnn_reshape_resize_bilinear2d_nhwc_u8");
     }
 
-    status = xnn_setup_resize_bilinear2d_nhwc(
+    status = xnn_setup_resize_bilinear2d_nhwc_u8(
         resize_op_,
         nullptr,
         input.data(),
         resize_output_.data());
     if (status != xnn_status_success) {
-      throw std::runtime_error("xnn_setup_resize_bilinear2d_nhwc");
+      throw std::runtime_error("xnn_setup_resize_bilinear2d_nhwc_u8");
     }
 
     status = xnn_run_operator(resize_op_, nullptr);

@@ -63,7 +63,7 @@ public:
 
     size_t shape[] = {input.height(), input.width(), input.channels()};
     int64_t axes[] = {0, 1};
-    size_t workspace_size;
+    size_t workspace_size, workspace_alignment;
     status = xnn_reshape_reduce_nd(
         pool_op_,
         2,
@@ -71,6 +71,7 @@ public:
         3,
         shape,
         &workspace_size,
+        &workspace_alignment,
         nullptr);
     if (status != xnn_status_success) {
       throw std::runtime_error("xnn_reshape_reduce_nd");
