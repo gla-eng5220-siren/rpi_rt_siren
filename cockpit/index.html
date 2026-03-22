@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>FlameIris Cockpit</title>
+
+  <link rel="stylesheet" href="uPlot.min.css">
+  <script src="uPlot.iife.min.js"></script>
+
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #111;
+      color: #ddd;
+    }
+    #chart_outer {
+      width: 320px;
+      float: right;
+    }
+    #chart {
+      width: 320px;
+    }
+    #cam {
+      width: 320px;
+      float: left;
+    }
+    #container {
+      width: 680px;
+      margin: 0 auto;
+    }
+  </style>
+</head>
+<body>
+
+<div id="container">
+  <h1>FlameIris Cockpit</h1>
+  <div id="cam">
+    <h2>Live Cam</h2>
+    <img src="/cam" width="320" height="240"/>
+  </div>
+  <div id="chart_outer">
+    <h2>Fire Probability</h2>
+    <div id="chart">
+    </div>
+  </div>
+</div>
+
+<script>
+const MAX_POINTS = 300;
+
+let xs = [];
+let ys = [];
+
+const opts = {
+  width: 320,
+  height: 240,
+  series: [
+    {}, // x
+    {
+      label: "value",
+      stroke: "lime",
+      width: 2,
+    }
+  ],
+  axes: [
+    {
+      stroke: "#888",
+      grid: { stroke: "#333" }
+    },
+    {
+      stroke: "#888",
+      grid: { stroke: "#333" }
+    }
+  ],
+  scales: {
+    y: {
+      range: [0, 1.0],
+    }
+  },
+  legend: {
+    show: false,
+  },
+};
+
+const uplot = new uPlot(opts, [xs, ys], document.getElementById("chart"));
+const source = new EventSource("logit");
+
+function sigmoid(logit) {
+  return 1 / (1 + Math.exp(-logit));
+}
+
+source.onmessage = (event) => {
+  const now = Date.now();
+  const value = 1.0 - sigmoid(parseFloat(event.data));
+  const t = now / 1000; // seconds
+  xs.push(t);
+  ys.push(value);
+  if (xs.length > MAX_POINTS) {
+    xs.shift();
+    ys.shift();
+  }
+  uplot.setData([xs, ys]);
+};
+</script>
+
+</body>
+</html>
