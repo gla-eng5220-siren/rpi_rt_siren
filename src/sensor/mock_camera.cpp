@@ -38,7 +38,8 @@ namespace rpi_rt {
         scaler_init();
 
         while (!closing_) {
-          if (int ret = ::av_read_frame(fmt_ctx_.get(), pkt_.get()) < 0) {
+          int ret = ::av_read_frame(fmt_ctx_.get(), pkt_.get());
+          if (ret < 0) {
             if (ret == AVERROR_EOF) {
               seek_begin(); // loop over
               continue;
@@ -109,8 +110,9 @@ namespace rpi_rt {
       }
 
       void seek_begin() {
-        avwrap::avformat_seek_file_chk(fmt_ctx_.get(), -1, 0,
-            0, 0, AVSEEK_FLAG_BYTE);
+        avwrap::avformat_seek_file_chk(fmt_ctx_.get(), video_stream_index_,
+            INT64_MIN, 0, INT64_MAX, 0);
+        ::avcodec_flush_buffers(video_dec_ctx_.get());
       }
 
       void invoke_callback() {
