@@ -31,13 +31,14 @@ FlameIris depends on the following pre-installed libraries:
 - libv4l
 - catch2
 - xnnpack
+- FFMPEG
 
 CMake and at least one working C++ compiler are required as well.
 
 Instructions for Debian or Raspbian Trixie:
 
 ~~~
-sudo apt-get install cmake g++ libjpeg-dev libv4l-dev libcatch2-dev libxnnpack-dev pkg-config
+sudo apt-get install cmake g++ libjpeg-dev libv4l-dev libcatch2-dev libxnnpack-dev libavformat-dev libavcodec-dev libavutil-dev libswscale-dev pkg-config
 ~~~
 
 If you don't install the suggested version of XNNPACK or Catch2, it will be automatically downloaded and compiled. Beware this may take very long.

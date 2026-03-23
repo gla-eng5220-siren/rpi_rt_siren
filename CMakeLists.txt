@@ -8,6 +8,7 @@ option(USE_SYSTEM_XNNPACK "Use system-installed XNNPACK" ON)
 include(EnsureXNNPACK) # provides XNNPACK::XNNPACK
 find_package(Threads)
 find_package(JPEG REQUIRED)
+find_package(FFMPEG COMPONENTS avformat avcodec avutil swscale REQUIRED)
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(LibV4l2 REQUIRED IMPORTED_TARGET GLOBAL libv4l2)
 
@@ -57,6 +58,7 @@ target_link_libraries(demo_capture PRIVATE
 add_executable(flame_iris
   src/flame_iris.cpp
   src/sensor/v4l2_camera.cpp
+  src/sensor/mock_camera.cpp
   src/logic/shufflenet.cpp
   src/misc/jpeg_utils.cpp
   src/http_server/http_server.cpp
@@ -69,5 +71,9 @@ target_link_libraries(flame_iris PRIVATE
   XNNPACK::XNNPACK
   PkgConfig::LibV4l2
   JPEG::JPEG
+  FFMPEG::avformat
+  FFMPEG::avcodec
+  FFMPEG::avutil
+  FFMPEG::swscale
 )
 

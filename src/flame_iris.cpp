@@ -8,7 +8,8 @@
 #include <iostream>
 
 int main(void) {
-  auto sensor = rpi_rt::create_v4l2_camera_sensor();
+  // auto sensor = rpi_rt::create_v4l2_camera_sensor();
+  auto sensor = rpi_rt::create_mock_camera_sensor("vid.mp4");
 
   const char* model_path_ptr = std::getenv("MODEL_PATH");
   std::string model_path{"model"};
