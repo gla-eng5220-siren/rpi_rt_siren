@@ -10,7 +10,7 @@ namespace rpi_rt {
     public:
       virtual ~http_server_t() {}
 
-      virtual void setup() = 0;
+      virtual void setup(const std::string& cockpit_path) = 0;
       virtual void run(const std::string& host, int port) = 0;
       virtual void close() = 0;
       virtual void set_cam_frame(Frame<uint8_t>) = 0;

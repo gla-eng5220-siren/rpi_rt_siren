@@ -4,6 +4,7 @@
 #include <functional>
 #include <memory>
 #include <mutex>
+#include <stdexcept>
 #include <thread>
 #include <atomic>
 
@@ -16,7 +17,7 @@ namespace rpi_rt {
     public:
       virtual ~http_server_impl() override {}
 
-      virtual void setup() override {
+      virtual void setup(const std::string& cockpit_path) override {
         svr_.Get("/cam", [this](
               const httplib::Request& req, httplib::Response& res) {
           this->handle_cam_request(req, res);
@@ -30,6 +31,10 @@ namespace rpi_rt {
             {"Access-Control-Allow-Methods", "GET, HEAD, OPTIONS"},
             {"Access-Control-Allow-Headers", "*"}
         });
+        auto ret = svr_.set_mount_point("/", cockpit_path);
+        if (!ret) {
+          throw std::runtime_error("Specified cockpit path cannot be mounted");
+        }
       }
 
       virtual void run(const std::string& host, int port) override {
