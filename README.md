@@ -36,6 +36,9 @@ CMake and at least one working C++ compiler are required as well.
 
 Instructions for Debian or Raspbian Trixie:
 
+
+aa
+
 ~~~
 sudo apt-get install cmake g++ libjpeg-dev libv4l-dev libcatch2-dev libxnnpack-dev pkg-config
 ~~~
