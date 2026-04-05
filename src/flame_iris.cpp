@@ -2,6 +2,7 @@
 #include "frame.hpp"
 #include "sensor.hpp"
 #include "logic.hpp"
+#include "thread_actor.hpp"
 
 #include <sstream>
 #include <thread>
@@ -17,35 +18,33 @@ int main(void) {
   auto model = rpi_rt::create_shufflenet_model();
   model->setup(model_path);
 
-  rpi_rt::visual_classify_logic_t logic;
-  logic.logit_threshold(0.0f);
-  logic.model(model);
+  auto logic = std::make_shared<rpi_rt::visual_classify_logic_t>();
+  logic->logit_threshold(0.0f);
+  logic->model(model);
 
   auto alarm = rpi_rt::create_stdout_alarm();
 
-  logic.set_detection_result_callback([&alarm](std::unique_ptr<rpi_rt::detection_result_t> result) {
+  rpi_rt::SensorLogicThread<rpi_rt::camera_sensor_t, rpi_rt::visual_classify_logic_t>
+    sensor_logic_thread;
+  sensor_logic_thread.set_sensor(sensor);
+  sensor_logic_thread.set_logic(logic);
+
+  sensor_logic_thread.set_detection_result_callback([&alarm](std::unique_ptr<rpi_rt::detection_result_t> result) {
     alarm->report(std::move(result));
   });
 
-  sensor->set_frame_callback([&logic](rpi_rt::Frame<uint8_t> frame) {
-    logic.process(frame);
-  });
+  rpi_rt::AlarmThread alarm_thread;
+  alarm_thread.set_alarm(alarm);
 
-  std::thread sensor_thread([self = sensor](){
-    self->run();
-  });
-  std::thread alarm_thread([self = alarm](){
-    self->run();
-  });
+  sensor_logic_thread.run();
+  alarm_thread.run();
 
   for (;;) {
     std::this_thread::sleep_for(std::chrono::seconds{10});
   }
 
-  sensor->close();
-  alarm->close();
-  sensor_thread.join();
-  alarm_thread.join();
+  sensor_logic_thread.close();
+  alarm_thread.close();
   return 0;
 }
 
