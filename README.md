@@ -52,7 +52,16 @@ cmake --build build
 ### Running
 
 ~~~
-MODEL_PATH=testdata/model ./build/flame_iris
+./build/release/flame_iris --v4l2 /dev/video0 --model testdata/model --alarm-stdout
+~~~
+
+You will see output like:
+
+~~~
+Visual LOGIT: 8.25474 THRESHOLD: 0 [NO FIRE]
+Visual LOGIT: 8.3169 THRESHOLD: 0 [NO FIRE]
+Visual LOGIT: 8.30164 THRESHOLD: 0 [NO FIRE]
+...
 ~~~
 
 A few caveats (temporarily):
