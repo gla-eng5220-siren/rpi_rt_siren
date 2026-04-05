@@ -29,10 +29,21 @@ namespace rpi_rt {
     }
   }
 
+  class sensor_logic_thread_t {
+    public:
+      virtual ~sensor_logic_thread_t() {}
+
+      virtual void set_detection_result_callback(
+          std::function<void (std::unique_ptr<detection_result_t>)> callback) = 0;
+      virtual void run() = 0;
+      virtual void close() = 0;
+  };
+
   template <class Sensor, class Logic>
-  class SensorLogicThread {
+  class SensorLogicThread : public sensor_logic_thread_t {
     public:
       SensorLogicThread() {};
+      virtual ~SensorLogicThread() {}
       SensorLogicThread(const SensorLogicThread&) = delete;
       SensorLogicThread(SensorLogicThread&&) = delete;
       SensorLogicThread& operator=(const SensorLogicThread&) = delete;
@@ -57,8 +68,8 @@ namespace rpi_rt {
         logic_ = logic;
       }
 
-      void set_detection_result_callback(
-          std::function<void (std::unique_ptr<detection_result_t>)> callback) {
+      virtual void set_detection_result_callback(
+          std::function<void (std::unique_ptr<detection_result_t>)> callback) override {
         logic_->set_detection_result_callback(callback);
       }
 
@@ -68,13 +79,13 @@ namespace rpi_rt {
       std::thread thread_;
   };
 
-  class AlarmThread {
+  class alarm_thread_t {
     public:
-      AlarmThread() {};
-      AlarmThread(const AlarmThread&) = delete;
-      AlarmThread(AlarmThread&&) = delete;
-      AlarmThread& operator=(const AlarmThread&) = delete;
-      AlarmThread& operator=(AlarmThread&&) = delete;
+      alarm_thread_t() {};
+      alarm_thread_t(const alarm_thread_t&) = delete;
+      alarm_thread_t(alarm_thread_t&&) = delete;
+      alarm_thread_t& operator=(const alarm_thread_t&) = delete;
+      alarm_thread_t& operator=(alarm_thread_t&&) = delete;
 
       void run() {
         thread_ = std::thread([alarm = alarm_](){
