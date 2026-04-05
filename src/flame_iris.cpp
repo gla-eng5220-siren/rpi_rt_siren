@@ -27,6 +27,20 @@ auto make_sensor_logic_thread(const argparse::ArgumentParser& program) {
     v_thread->set_sensor(sensor);
     v_thread->set_logic(logic);
     thread = std::move(v_thread);
+  } else if (program.present("--model") && program.present("--mock-cam")) {
+    auto sensor = rpi_rt::create_mock_camera_sensor(
+        program.get<std::string>("--mock-cam"));
+    auto model = rpi_rt::create_shufflenet_model();
+    model->setup(program.get<std::string>("--model"));
+    auto logic = std::make_shared<rpi_rt::visual_classify_logic_t>();
+    logic->logit_threshold(program.get<float>("--logit-threshold"));
+    logic->model(model);
+    auto v_thread = std::make_unique<
+      rpi_rt::SensorLogicThread<
+        rpi_rt::camera_sensor_t, rpi_rt::visual_classify_logic_t>>();
+    v_thread->set_sensor(sensor);
+    v_thread->set_logic(logic);
+    thread = std::move(v_thread);
   } else if (program.get<bool>("--mock-temp")) {
     auto sensor = rpi_rt::create_mock_temperature_sensor();
     auto logic = std::make_shared<rpi_rt::temperature_threshold_logic_t>();
@@ -58,6 +72,8 @@ int main(int argc, char** argv) {
   argparse::ArgumentParser program("flame_iris");
   program.add_argument("--v4l2")
     .help("Path to v4l2 camera device (e.g. /dev/video0)");
+  program.add_argument("--mock-cam")
+    .help("Use ffmpeg to loop a video as mock camera sensor");
   program.add_argument("--model")
     .help("Path to shufflenet model dir (e.g. testdata/model)");
   program.add_argument("--mock-temp")
