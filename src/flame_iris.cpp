@@ -13,8 +13,9 @@
 
 auto make_sensor_logic_thread(const argparse::ArgumentParser& program) {
   std::unique_ptr<rpi_rt::sensor_logic_thread_t> thread;
-  if (program.present("model") && program.present("v4l2")) {
-    auto sensor = rpi_rt::create_v4l2_camera_sensor(); // TODO pass the path
+  if (program.present("--model") && program.present("--v4l2")) {
+    auto sensor = rpi_rt::create_v4l2_camera_sensor(
+        program.get<std::string>("--v4l2"));
     auto model = rpi_rt::create_shufflenet_model();
     model->setup(program.get<std::string>("--model"));
     auto logic = std::make_shared<rpi_rt::visual_classify_logic_t>();
