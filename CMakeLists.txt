@@ -11,54 +11,18 @@ find_package(JPEG REQUIRED)
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(LibV4l2 REQUIRED IMPORTED_TARGET GLOBAL libv4l2)
 
-add_executable(demo_siren
-  src/demo_siren.cpp
-  src/sensor/mock_temperature_sensor.cpp
-  src/alarm/stdout_alarm.cpp
-)
-target_include_directories(demo_siren PRIVATE
-  ${CMAKE_CURRENT_SOURCE_DIR}/include
-)
-target_link_libraries(demo_siren PRIVATE
-  Threads::Threads
-)
-
-add_executable(demo_shufflenet
-  src/demo_shufflenet.cpp
-  src/logic/shufflenet.cpp
-  src/misc/jpeg_utils.cpp
-)
-target_include_directories(demo_shufflenet PRIVATE
-  ${CMAKE_CURRENT_SOURCE_DIR}/include
-)
-target_link_libraries(demo_shufflenet PRIVATE
-  Threads::Threads
-  XNNPACK
-  JPEG::JPEG
-)
-
 enable_testing()
 add_subdirectory(tests)
-
-add_executable(demo_capture
-  src/demo_capture.cpp
-  src/sensor/v4l2_camera.cpp
-  src/misc/jpeg_utils.cpp
-)
-target_include_directories(demo_capture PRIVATE
-  ${CMAKE_CURRENT_SOURCE_DIR}/include
-)
-target_link_libraries(demo_capture PRIVATE
-  Threads::Threads
-  PkgConfig::LibV4l2
-  JPEG::JPEG
-)
 
 add_executable(flame_iris
   src/flame_iris.cpp
   src/sensor/v4l2_camera.cpp
   src/logic/shufflenet.cpp
+  src/logic/temperature_threshold_logic.cpp
+  src/logic/visual_classify_logic.cpp
   src/misc/jpeg_utils.cpp
+  src/sensor/mock_temperature_sensor.cpp
+  src/alarm/stdout_alarm.cpp
 )
 target_include_directories(flame_iris PRIVATE
   ${CMAKE_CURRENT_SOURCE_DIR}/include
