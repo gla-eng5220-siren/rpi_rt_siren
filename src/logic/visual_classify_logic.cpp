@@ -23,8 +23,8 @@ namespace rpi_rt {
       virtual std::string explain() override {
         std::ostringstream oss;
         oss << "Visual LOGIT: " << logit_
-          << "THRESHOLD: " << logit_threshold_
-          << (has_fire() ? "[FIRE]" : "[NO FIRE]");
+          << " THRESHOLD: " << logit_threshold_
+          << (has_fire() ? " [FIRE]" : " [NO FIRE]");
         return oss.str();
       }
 

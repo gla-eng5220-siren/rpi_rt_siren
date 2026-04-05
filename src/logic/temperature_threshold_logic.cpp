@@ -25,7 +25,7 @@ namespace rpi_rt {
         std::ostringstream oss;
         oss << "Temperature CELSIUS: " << celsius_
           << " THRESHOLD: " << threshold_
-          << (has_fire() ? "[FIRE]" : "[NO FIRE]");
+          << (has_fire() ? " [FIRE]" : " [NO FIRE]");
         return oss.str();
       }
 
