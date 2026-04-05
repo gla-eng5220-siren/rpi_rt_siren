@@ -17,9 +17,7 @@
 
 ## Demo Screenshots
 
-![Detecting UofG landscape photo -- no fire detected](/imgs/no_fire.png)
-
-![Detecting house fire picture from Dunnings 2018 Dataset -- fire detected](/imgs/fire.png)
+![WebUI](/imgs/webui.png)
 
 ## Building
 
