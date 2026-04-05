@@ -25,10 +25,13 @@
 namespace rpi_rt {
   class v4l2_camera_sensor_t : public camera_sensor_t {
     public:
+      explicit v4l2_camera_sensor_t(const std::string& device)
+        : device_(device) {}
+
       virtual ~v4l2_camera_sensor_t() override {}
 
       virtual void run() override {
-        open("/dev/video0");
+        open(device_);
         negotiate_format();
         request_buffers(buffer_count_);
         for (size_t i = 0; i < buffer_count_; i++) {
@@ -187,6 +190,7 @@ namespace rpi_rt {
         callback_(std::move(frame));
       }
 
+      const std::string device_ = "/dev/video0";
       std::function<void (Frame<uint8_t>)> callback_;
       std::atomic<bool> closing_ = ATOMIC_VAR_INIT(false);
       size_t height_ = 0;
@@ -197,8 +201,8 @@ namespace rpi_rt {
       static constexpr size_t buffer_count_ = 10;
   };
 
-  std::shared_ptr<camera_sensor_t> create_v4l2_camera_sensor() {
-    return std::make_shared<v4l2_camera_sensor_t>();
+  std::shared_ptr<camera_sensor_t> create_v4l2_camera_sensor(const std::string& device) {
+    return std::make_shared<v4l2_camera_sensor_t>(device);
   }
 
 }

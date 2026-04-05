@@ -28,6 +28,6 @@ namespace rpi_rt {
 
   std::shared_ptr<temperature_sensor_t> create_mock_temperature_sensor();
   // std::shared_ptr<camera_sensor_t> create_mock_camera_sensor();
-  std::shared_ptr<camera_sensor_t> create_v4l2_camera_sensor();
+  std::shared_ptr<camera_sensor_t> create_v4l2_camera_sensor(const std::string& device);
 }
 
