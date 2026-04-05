@@ -4,6 +4,7 @@
 #include <stdexcept>
 #include <fstream>
 #include <iterator>
+#include <sstream>
 
 #include "logic.hpp"
 
@@ -19,6 +20,14 @@ namespace rpi_rt {
         return logit_ < logit_threshold_;
       }
 
+      virtual std::string explain() override {
+        std::ostringstream oss;
+        oss << "Visual LOGIT: " << logit_
+          << "THRESHOLD: " << logit_threshold_
+          << (has_fire() ? "[FIRE]" : "[NO FIRE]");
+        return oss.str();
+      }
+
     private:
       float logit_;
       float logit_threshold_;
@@ -26,8 +35,9 @@ namespace rpi_rt {
 
   void visual_classify_logic_t::process(const Frame<uint8_t>& frame) {
     float logit = model_->process(frame);
-    visual_detection_result result{logit, logit_threshold_};
-    callback_(result);
+    auto result = std::make_unique<visual_detection_result>(
+        logit, logit_threshold_);
+    callback_(std::move(result));
   }
 }
 

@@ -23,10 +23,8 @@ int main(void) {
 
   auto alarm = rpi_rt::create_stdout_alarm();
 
-  logic.set_detection_result_callback([&alarm](rpi_rt::detection_result_t& result) {
-    if (result.has_fire()) {
-      alarm->report_fire();
-    }
+  logic.set_detection_result_callback([&alarm](std::unique_ptr<rpi_rt::detection_result_t> result) {
+    alarm->report(std::move(result));
   });
 
   sensor->set_frame_callback([&logic](rpi_rt::Frame<uint8_t> frame) {

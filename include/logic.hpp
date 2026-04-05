@@ -3,14 +3,9 @@
 #include <memory>
 
 #include "frame.hpp"
+#include "detection_result.hpp"
 
 namespace rpi_rt {
-  class detection_result_t {
-    public:
-      virtual ~detection_result_t() {}
-      virtual bool has_fire() = 0;
-  };
-
   class visual_classfying_model_t {
     public:
       virtual ~visual_classfying_model_t() {}
@@ -38,7 +33,7 @@ namespace rpi_rt {
         model_ = m;
       }
 
-      void set_detection_result_callback(std::function<void (detection_result_t&)> callback) {
+      void set_detection_result_callback(std::function<void (std::unique_ptr<detection_result_t>)> callback) {
         callback_ = callback;
       }
 
@@ -47,7 +42,7 @@ namespace rpi_rt {
     private:
       float logit_threshold_ = 0.0;
       std::shared_ptr<visual_classfying_model_t> model_;
-      std::function<void (detection_result_t&)> callback_;
+      std::function<void (std::unique_ptr<detection_result_t>)> callback_;
   };
 
   class temperature_threshold_logic_t {
@@ -61,7 +56,7 @@ namespace rpi_rt {
         celsius_threshold_ = celsius;
       }
 
-      void set_detection_result_callback(std::function<void (detection_result_t&)> callback) {
+      void set_detection_result_callback(std::function<void (std::unique_ptr<detection_result_t>)> callback) {
         callback_ = callback;
       }
 
@@ -69,7 +64,7 @@ namespace rpi_rt {
 
     private:
       float celsius_threshold_ = 0.0;
-      std::function<void (detection_result_t&)> callback_;
+      std::function<void (std::unique_ptr<detection_result_t>)> callback_;
   };
 }
 

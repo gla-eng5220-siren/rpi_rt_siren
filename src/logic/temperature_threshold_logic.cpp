@@ -1,9 +1,11 @@
 #include <chrono>
 #include <functional>
 #include <memory>
+#include <sstream>
 #include <stdexcept>
 #include <fstream>
 #include <iterator>
+#include <utility>
 
 #include "logic.hpp"
 
@@ -19,14 +21,23 @@ namespace rpi_rt {
         return celsius_ > threshold_;
       }
 
+      virtual std::string explain() override {
+        std::ostringstream oss;
+        oss << "Temperature CELSIUS: " << celsius_
+          << " THRESHOLD: " << threshold_
+          << (has_fire() ? "[FIRE]" : "[NO FIRE]");
+        return oss.str();
+      }
+
     private:
       float celsius_;
       float threshold_;
   };
 
   void temperature_threshold_logic_t::process(float celsius) {
-    temperature_threshold_result result{celsius, celsius_threshold_};
-    callback_(result);
+    auto result = std::make_unique<temperature_threshold_result>(
+        celsius, celsius_threshold_);
+    callback_(std::move(result));
   }
 }
 
