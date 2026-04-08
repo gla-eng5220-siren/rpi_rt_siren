@@ -11,6 +11,7 @@ find_package(JPEG REQUIRED)
 find_package(FFMPEG COMPONENTS avformat avcodec avutil swscale REQUIRED)
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(LibV4l2 REQUIRED IMPORTED_TARGET GLOBAL libv4l2)
+pkg_check_modules(LibGpiod REQUIRED IMPORTED_TARGET GLOBAL libgpiod libgpiodcxx)
 find_package(OpenSSL COMPONENTS Crypto SSL REQUIRED)
 
 enable_testing()
@@ -27,6 +28,7 @@ add_executable(flame_iris
   src/sensor/mock_temperature_sensor.cpp
   src/alarm/stdout_alarm.cpp
   src/alarm/brevo_email_alarm.cpp
+  src/alarm/buzzer.cpp
   src/http_server/http_server.cpp
 )
 target_include_directories(flame_iris PRIVATE
@@ -36,6 +38,7 @@ target_link_libraries(flame_iris PRIVATE
   Threads::Threads
   XNNPACK::XNNPACK
   PkgConfig::LibV4l2
+  PkgConfig::LibGpiod
   JPEG::JPEG
   FFMPEG::avformat
   FFMPEG::avcodec
