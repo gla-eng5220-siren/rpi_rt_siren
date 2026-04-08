@@ -14,6 +14,18 @@
 
 static std::shared_ptr<rpi_rt::http_server_t> webui;
 
+auto make_brevo_config(const argparse::ArgumentParser& program) {
+  rpi_rt::brevo_config_t cfg;
+  cfg.api_host = program.get<std::string>("--brevo-api-host");
+  cfg.api_path = program.get<std::string>("--brevo-api-path");
+  cfg.api_key = program.get<std::string>("--brevo-api-key");
+  cfg.sender_name = program.get<std::string>("--brevo-sender-name");
+  cfg.sender_email = program.get<std::string>("--brevo-sender-email");
+  cfg.to_name = program.get<std::string>("--brevo-to-name");
+  cfg.to_email = program.get<std::string>("--brevo-to-email");
+  return cfg;
+}
+
 auto make_vision_logic(const argparse::ArgumentParser& program) {
   auto model = rpi_rt::create_shufflenet_model();
   model->setup(program.get<std::string>("--model"));
@@ -70,7 +82,11 @@ auto make_sensor_logic_thread(const argparse::ArgumentParser& program) {
 
 auto make_alarm_thread(const argparse::ArgumentParser& program) {
   auto thread = std::make_unique<rpi_rt::alarm_thread_t>();
-  if (program.get<bool>("--alarm-stdout")) {
+  if (program.present("--brevo-api-key")) {
+    auto cfg = make_brevo_config(program);
+    auto alarm = rpi_rt::create_brevo_email_alarm(std::move(cfg));
+    thread->set_alarm(alarm);
+  } else if (program.get<bool>("--alarm-stdout")) {
     auto alarm = rpi_rt::create_stdout_alarm();
     thread->set_alarm(alarm);
   } else {
@@ -110,6 +126,26 @@ int main(int argc, char** argv) {
     .scan<'i', int>()
     .default_value(8383)
     .help("Webui listening port");
+
+  // brevo email alarming
+  program.add_argument("--brevo-api-host")
+    .default_value("api.brevo.com")
+    .help("Brevo email alarming API host");
+  program.add_argument("--brevo-api-path")
+    .default_value("/v3/smtp/email")
+    .help("Brevo email alarming API path");
+  program.add_argument("--brevo-api-key")
+    .help("Brevo email alarming API key");
+  program.add_argument("--brevo-sender-name")
+    .default_value("FlameIris Webhook")
+    .help("Brevo email alarming sender name");
+  program.add_argument("--brevo-sender-email")
+    .help("Brevo email alarming sender email");
+  program.add_argument("--brevo-to-name")
+    .default_value("FlameIris User")
+    .help("Brevo email alarming receiver name");
+  program.add_argument("--brevo-to-email")
+    .help("Brevo email alarming receiver email");
 
   program.parse_args(argc, argv);
 

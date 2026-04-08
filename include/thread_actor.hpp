@@ -17,9 +17,13 @@ namespace rpi_rt {
       std::shared_ptr<http_server_t> webui
     ) {
       s->set_frame_callback([l, webui](rpi_rt::Frame<uint8_t> frame) {
-        webui->set_cam_frame(frame);
+        if (webui) {
+          webui->set_cam_frame(frame);
+        }
         l->process(frame);
-        webui->set_logit(l->last_logit());
+        if (webui) {
+          webui->set_logit(l->last_logit());
+        }
       });
     }
 
