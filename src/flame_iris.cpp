@@ -54,7 +54,12 @@ auto make_vision_thread(
 
 auto make_sensor_logic_thread(const argparse::ArgumentParser& program) {
   std::unique_ptr<rpi_rt::sensor_logic_thread_t> thread;
-  if (program.present("--model") && program.present("--v4l2")) {
+  if (program.present("--model") && program.present<int>("--libcamera")) {
+    auto sensor = rpi_rt::create_libcamera_sensor(
+        program.get<int>("--libcamera"));
+    auto logic = make_vision_logic(program);
+    thread = make_vision_thread(sensor, logic);
+  } else if (program.present("--model") && program.present("--v4l2")) {
     auto sensor = rpi_rt::create_v4l2_camera_sensor(
         program.get<std::string>("--v4l2"));
     auto logic = make_vision_logic(program);
@@ -97,6 +102,9 @@ auto make_alarm_thread(const argparse::ArgumentParser& program) {
 
 int main(int argc, char** argv) {
   argparse::ArgumentParser program("flame_iris");
+  program.add_argument("--libcamera")
+    .help("libcamera camera index (e.g. 0)")
+    .scan<'i', int>();
   program.add_argument("--v4l2")
     .help("Path to v4l2 camera device (e.g. /dev/video0)");
   program.add_argument("--mock-cam")

@@ -109,6 +109,7 @@ AV_FNDEF_CHK(avformat_open_input);
 AV_FNDEF_CHK(avformat_find_stream_info);
 AV_FNDEF_CHK(avformat_seek_file);
 AV_FNDEF_CHK(sws_scale_frame);
+AV_FNDEF_CHK(sws_scale);
 
 template <class T, void (*F)(T*)>
 struct av_deleter_wrapper {
