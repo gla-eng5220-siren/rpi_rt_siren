@@ -40,7 +40,7 @@ CMake and at least one working C++ compiler are required as well.
 Instructions for Debian or Raspbian Trixie:
 
 ~~~
-sudo apt-get install cmake g++ libjpeg-dev libv4l-dev libcatch2-dev libxnnpack-dev libpthreadpool-dev libavformat-dev libavcodec-dev libavutil-dev libswscale-dev pkg-config libssl-dev libgpiod-dev
+sudo apt-get install cmake g++ libjpeg-dev libv4l-dev libcatch2-dev libxnnpack-dev libpthreadpool-dev libavformat-dev libavcodec-dev libavutil-dev libswscale-dev pkg-config libssl-dev libgpiod-dev libcamera-dev
 ~~~
 
 If you don't install the suggested version of XNNPACK or Catch2, it will be automatically downloaded and compiled. Beware this may take very long.
@@ -55,7 +55,7 @@ cmake --build build
 ### Running
 
 ~~~
-./build/release/flame_iris --v4l2 /dev/video0 --model testdata/model --alarm-stdout
+./build/release/flame_iris --libcamera 0 --model testdata/model --alarm-stdout
 ~~~
 
 You will see output like:
@@ -69,7 +69,6 @@ Visual LOGIT: 8.30164 THRESHOLD: 0 [NO FIRE]
 
 A few caveats (temporarily):
 
-* A working webcam is expected at /dev/video0
 * For now, the program will continuously output detection results to stdout. We will support the buzzer and sound alarm in the future.
 
 ## Affiliation

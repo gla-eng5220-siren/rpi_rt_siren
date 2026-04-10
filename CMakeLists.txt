@@ -12,6 +12,7 @@ find_package(FFMPEG COMPONENTS avformat avcodec avutil swscale REQUIRED)
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(LibV4l2 REQUIRED IMPORTED_TARGET GLOBAL libv4l2)
 pkg_check_modules(LibGpiod REQUIRED IMPORTED_TARGET GLOBAL libgpiod libgpiodcxx)
+pkg_check_modules(LibCamera REQUIRED IMPORTED_TARGET GLOBAL libcamera libcamera-base)
 find_package(OpenSSL COMPONENTS Crypto SSL REQUIRED)
 
 enable_testing()
@@ -20,6 +21,7 @@ add_subdirectory(tests)
 add_executable(flame_iris
   src/flame_iris.cpp
   src/sensor/v4l2_camera.cpp
+  src/sensor/libcamera.cpp
   src/sensor/mock_camera.cpp
   src/logic/shufflenet.cpp
   src/logic/temperature_threshold_logic.cpp
@@ -39,6 +41,7 @@ target_link_libraries(flame_iris PRIVATE
   XNNPACK::XNNPACK
   PkgConfig::LibV4l2
   PkgConfig::LibGpiod
+  PkgConfig::LibCamera
   JPEG::JPEG
   FFMPEG::avformat
   FFMPEG::avcodec
