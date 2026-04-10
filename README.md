@@ -28,6 +28,7 @@
 FlameIris depends on the following pre-installed libraries:
 
 - libjpeg
+- libcamera
 - libv4l
 - libgpiod
 - catch2
