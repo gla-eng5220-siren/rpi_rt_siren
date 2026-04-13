@@ -94,6 +94,9 @@ auto make_alarm_thread(const argparse::ArgumentParser& program) {
   } else if (program.get<bool>("--alarm-stdout")) {
     auto alarm = rpi_rt::create_stdout_alarm();
     thread->set_alarm(alarm);
+  } else if (program.present<int>("--buzzer")) {
+    auto alarm = rpi_rt::create_buzzer_alarm(program.get<int>("--buzzer"));
+    thread->set_alarm(alarm);
   } else {
     throw std::runtime_error("No valid alarm specified");
   }
@@ -117,6 +120,9 @@ int main(int argc, char** argv) {
   program.add_argument("--alarm-stdout")
     .help("Print alarm message to stdout")
     .flag();
+  program.add_argument("--buzzer")
+    .help("GPIO buzzer pin")
+    .scan<'i', int>();
   program.add_argument("--temp-threshold")
     .help("Temperature threshold in celsius degree")
     .default_value(200.0f)

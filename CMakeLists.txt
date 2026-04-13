@@ -29,6 +29,7 @@ add_executable(flame_iris
   src/misc/jpeg_utils.cpp
   src/sensor/mock_temperature_sensor.cpp
   src/alarm/stdout_alarm.cpp
+  src/alarm/buzzer_alarm.cpp
   src/alarm/brevo_email_alarm.cpp
   src/alarm/buzzer.cpp
   src/http_server/http_server.cpp

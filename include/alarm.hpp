@@ -74,6 +74,16 @@ namespace rpi_rt {
   std::shared_ptr<alarm_t> create_stdout_alarm();
 
   /**
+   * The factory method for creating a alarm_t reporting via GPIO
+   * buzzer pin
+   *
+   * Adhere to the Interface Segregation Principle (ISP) in SOLID.
+   *
+   * @param pin GPIO pin connected to the buzzer
+   */
+  std::shared_ptr<alarm_t> create_buzzer_alarm(int pin);
+
+  /**
    * The factory method for creating a alarm_t reporting via Brevo
    * transactional email service.
    *
