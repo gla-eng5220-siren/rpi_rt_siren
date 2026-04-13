@@ -3,6 +3,7 @@
 #include <memory>
 #include <functional>
 #include <cstdint>
+#include <string>
 
 #include "frame.hpp"
 
@@ -77,6 +78,13 @@ namespace rpi_rt {
    * Adhere to the Interface Segregation Principle (ISP) in SOLID.
    */
   std::shared_ptr<temperature_sensor_t> create_mock_temperature_sensor();
+
+  /**
+   * The factory method for creating a temperature_sensor_t from BreadPi ADC + NTC.
+   *
+   * Adhere to the Interface Segregation Principle (ISP) in SOLID.
+   */
+  std::shared_ptr<temperature_sensor_t> create_breadpi_temperature_sensor();
 
   /**
    * The factory method for creating a camera_sensor_t reporting mock data.
