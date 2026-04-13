@@ -42,11 +42,13 @@ namespace rpi_rt {
       }
 
       virtual void close() override {
-        svr_.stop();
+        running_ = false;
 
-        // also wake up pool threads blocking on next frame
+        // first wake up pool threads blocking on next frame
         cam_frame_cond_.notify_all();
         logit_cond_.notify_all();
+
+        svr_.stop();
       }
 
       virtual void set_cam_frame(Frame<uint8_t> frame) override {
@@ -78,7 +80,7 @@ namespace rpi_rt {
       }
 
       bool provide_cam_content(size_t, httplib::DataSink& sink) {
-        while (sink.is_writable()) {
+        while (running_ && sink.is_writable()) {
           std::unique_lock lg{cam_frame_mut_};
           std::vector<uint8_t> data = jpeg_utils::write_to_mem(cam_frame_);
 
@@ -88,7 +90,7 @@ namespace rpi_rt {
           sink.os.flush();
           sink.write(reinterpret_cast<const char*>(data.data()), data.size());
 
-          cam_frame_cond_.wait(lg);
+          cam_frame_cond_.wait_for(lg, std::chrono::milliseconds{500});
         }
 
         sink.done();
@@ -107,14 +109,14 @@ namespace rpi_rt {
       }
 
       bool provide_logit_content(size_t, httplib::DataSink& sink) {
-        while (sink.is_writable()) {
+        while (running_ && sink.is_writable()) {
           std::unique_lock lg{logit_mut_};
           if (logit_ != INFINITY) { // only start to steam after first detection
             sink.os << "data: " << logit_ << "\r\n\r\n";
             sink.os.flush();
           }
 
-          logit_cond_.wait(lg);
+          logit_cond_.wait_for(lg, std::chrono::milliseconds{500});
         }
 
         sink.done();
@@ -130,6 +132,8 @@ namespace rpi_rt {
       std::condition_variable logit_cond_;
 
       httplib::Server svr_;
+
+      std::atomic<bool> running_ = ATOMIC_VAR_INIT(true);
   };
 
   std::shared_ptr<http_server_t> create_http_server() {

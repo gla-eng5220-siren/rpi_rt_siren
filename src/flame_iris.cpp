@@ -112,7 +112,6 @@ int main(int argc, char** argv) {
   sigset_t mask;
   sigemptyset(&mask);
   sigaddset(&mask, SIGINT);
-  sigaddset(&mask, SIGQUIT);
 
   if (sigprocmask(SIG_BLOCK, &mask, NULL) < 0)
     throw std::system_error(std::make_error_code(std::errc(errno)));
@@ -214,8 +213,7 @@ int main(int argc, char** argv) {
       throw std::system_error(std::make_error_code(std::errc(errno)));
 
     switch (fdsi.ssi_signo) {
-      case SIGINT: // fallthrough
-      case SIGQUIT:
+      case SIGINT:
         std::cout << "Gracefully exitting .." << std::endl;
         running = false;
         break;
