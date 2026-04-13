@@ -1,8 +1,11 @@
 #pragma once
 
+#include <chrono>
 #include <vector>
 #include <string>
 #include <cstdint>
+#include <atomic>
+#include <iostream>
 
 namespace rpi_rt {
 
@@ -106,6 +109,40 @@ namespace jpeg_utils {
   Frame<uint8_t> read_from_file(const std::string& filename);
   void write_to_file(const Frame<uint8_t>& frame, const std::string& file);
   std::vector<uint8_t> write_to_mem(const Frame<uint8_t>& frame);
+}
+
+namespace latency_assessment {
+
+namespace detail {
+  inline std::atomic<bool>& do_assessment_flag() {
+    static std::atomic<bool> flag = ATOMIC_VAR_INIT(false);
+    return flag;
+  }
+}
+
+  inline void begin_assessment() {
+    detail::do_assessment_flag() = true;
+  } 
+
+  inline void end_assessment() {
+    detail::do_assessment_flag() = false;
+  } 
+
+  inline uint64_t make_frame_id() {
+    static std::atomic<uint64_t> next_frame_id = ATOMIC_VAR_INIT(0);
+    return ++next_frame_id;
+  }
+
+  inline void report_timepoint(uint64_t frame_id, bool completed = false) {
+    if (!detail::do_assessment_flag())
+      return;
+
+    auto tp = std::chrono::steady_clock::now();
+    std::cout << "!!LATENCY " << ( completed ? "E" : "S" )
+      << " id=" << frame_id
+      << " time=" << std::chrono::duration_cast<std::chrono::nanoseconds>(
+          tp.time_since_epoch()).count() << std::endl;
+  }
 }
 
 /// @endcond

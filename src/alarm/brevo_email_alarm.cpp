@@ -9,6 +9,7 @@
 
 #include "alarm.hpp"
 #include "detection_result.hpp"
+#include "frame.hpp"
 
 #define CPPHTTPLIB_OPENSSL_SUPPORT
 #pragma GCC diagnostic push
@@ -90,6 +91,7 @@ namespace rpi_rt {
           while(!closing_) {
             cond_result_.wait_for(lg, std::chrono::milliseconds{500});
             if (result_) {
+              latency_assessment::report_timepoint(result_->frame_id(), true);
               if (result_->has_fire()) {
                 if (last_send_) {
                   auto now = std::chrono::steady_clock::now();

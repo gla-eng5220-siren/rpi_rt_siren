@@ -67,7 +67,7 @@ TEST_CASE("PassDetectionResult", "[system][alarm][detection_result]") {
 TEST_CASE("MockTempSensor", "[system][sensor]") {
   auto sensor = rpi_rt::create_mock_temperature_sensor();
   size_t got_data = 0;
-  sensor->set_celsius_reciever([&got_data](float){
+  sensor->set_celsius_reciever([&got_data](uint64_t, float){
     got_data++;
   });
   std::thread th{[&sensor](){
@@ -82,7 +82,7 @@ TEST_CASE("MockTempSensor", "[system][sensor]") {
 TEST_CASE("MockCameraSensor", "[system][sensor][ffmpeg]") {
   auto sensor = rpi_rt::create_mock_camera_sensor(TESTDATA_PATH "/vid.mp4");
   size_t got_frame = 0;
-  sensor->set_frame_callback([&got_frame](rpi_rt::Frame<uint8_t> frame) {
+  sensor->set_frame_callback([&got_frame](uint64_t, rpi_rt::Frame<uint8_t> frame) {
     CHECK(frame.height() > 0);
     CHECK(frame.width() > 0);
     CHECK(frame.channels() == 3);

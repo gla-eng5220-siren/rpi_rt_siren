@@ -99,9 +99,10 @@ namespace rpi_rt {
       /**
        * Perform the actual detection.
        *
+       * @param frame_id For latency assessment. Should be the same as input frame.
        * @param frame The frame input. Should have 3 channels RGB.
        */
-      void process(const Frame<uint8_t>& frame);
+      void process(uint64_t frame_id, const Frame<uint8_t>& frame);
 
       /**
        * Get the logit for last detection.
@@ -153,9 +154,10 @@ namespace rpi_rt {
       /**
        * Perform the actual detection.
        *
+       * @param frame_id For latency assessment. Should be the same as input frame.
        * @param celsius The temperature.
        */
-      void process(float celsius);
+      void process(uint64_t frame_id, float celsius);
 
     private:
       float celsius_threshold_ = 0.0;

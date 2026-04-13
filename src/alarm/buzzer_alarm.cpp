@@ -10,6 +10,7 @@
 #include "alarm.hpp"
 #include "detection_result.hpp"
 #include "buzzer.h"
+#include "frame.hpp"
 
 namespace rpi_rt {
   class buzzer_alarm_t : public alarm_t {
@@ -23,6 +24,7 @@ namespace rpi_rt {
           while(!closing_) {
             cond_result_.wait_for(lg, std::chrono::milliseconds{500});
             if (result_) {
+              latency_assessment::report_timepoint(result_->frame_id(), true);
               if (result_->has_fire()) {
                 std::cout << "FIRE DETECTED" << std::endl;
 

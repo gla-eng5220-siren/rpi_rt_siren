@@ -228,7 +228,14 @@ int main(int argc, char** argv) {
     .scan<'g', float>()
     .help("The voltage value of Vref");
 
+  program.add_argument("--assess-latency")
+    .help("Generate latency report")
+    .flag();
+
   program.parse_args(argc, argv);
+
+  if (program.get<bool>("--assess-latency"))
+    rpi_rt::latency_assessment::begin_assessment();
 
   if (program.present("--webui-path")) {
     webui = rpi_rt::create_http_server();

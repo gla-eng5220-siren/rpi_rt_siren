@@ -55,7 +55,7 @@ namespace rpi_rt {
         cond_camera_.notify_one();
       }
 
-      virtual void set_frame_callback(std::function<void (Frame<uint8_t>)> callback) override {
+      virtual void set_frame_callback(std::function<void (uint64_t frame_id, Frame<uint8_t>)> callback) override {
         callback_ = callback;
       }
 
@@ -84,6 +84,9 @@ namespace rpi_rt {
       }
 
       void invoke_callback(const libcamera::FrameBuffer::Plane& plane) {
+        uint64_t frame_id = latency_assessment::make_frame_id();
+        latency_assessment::report_timepoint(frame_id);
+
         Frame<uint8_t> frame{height_, width_, 3};
 
         const uint8_t* data = fd_ptrs_[plane.fd.get()] + plane.offset;
@@ -95,7 +98,7 @@ namespace rpi_rt {
         uint8_t *dst_data[4] = { frame.data(), NULL, NULL, NULL };
         int dst_linesize[4] = { (int)(frame.width() * frame.channels()), 0, 0, 0 };
         avwrap::sws_scale_chk(sws_ctx_.get(), src_data, src_linesize, 0, height_, dst_data, dst_linesize); 
-        callback_(std::move(frame));
+        callback_(frame_id, std::move(frame));
       }
 
       void start_libcamera() {
@@ -206,7 +209,7 @@ namespace rpi_rt {
       }
 
       const unsigned cam_index_ = 0;
-      std::function<void (Frame<uint8_t>)> callback_;
+      std::function<void (uint64_t, Frame<uint8_t>)> callback_;
       std::atomic<bool> closing_ = ATOMIC_VAR_INIT(false);
       size_t height_ = 0;
       size_t width_ = 0;

@@ -12,6 +12,7 @@
 #include "third_party/i2c.h"
 
 #include "sensor.hpp"
+#include "frame.hpp"
 
 namespace rpi_rt {
 
@@ -31,12 +32,15 @@ public:
     virtual void run() override {
         setup();
         while (!closing_) {
+            uint64_t frame_id = latency_assessment::make_frame_id();
+            latency_assessment::report_timepoint(frame_id);
+
             try {
                 uint8_t raw = read_adc_raw();
                 float celsius = raw_to_celsius(raw);
 
                 if (report_celsius_) {
-                    report_celsius_(celsius);
+                    report_celsius_(frame_id, celsius);
                 }
 
                 std::cout << "[breadpi-temp] raw=" << static_cast<int>(raw)
@@ -53,7 +57,7 @@ public:
         closing_ = true;
     }
 
-    virtual void set_celsius_reciever(std::function<void(float)> callback) override {
+    virtual void set_celsius_reciever(std::function<void(uint64_t frame_id, float)> callback) override {
         report_celsius_ = callback;
     }
 
@@ -116,7 +120,7 @@ private:
     int bus_ = -1;
     breadpi_ntc_config_t cfg_;
     I2CDevice device_{};
-    std::function<void(float)> report_celsius_;
+    std::function<void(uint64_t frame_id, float)> report_celsius_;
     std::atomic<bool> closing_{false};
 };
 

@@ -5,6 +5,7 @@
 #include <atomic>
 
 #include "sensor.hpp"
+#include "frame.hpp"
 
 namespace rpi_rt {
   class mock_temperature_sensor_t : public temperature_sensor_t {
@@ -22,7 +23,9 @@ namespace rpi_rt {
         size_t i_mock = 0;
         while (!closing_) {
           std::this_thread::sleep_for(std::chrono::milliseconds{500});
-          report_celsius_(mock_data[i_mock++]);
+          uint64_t frame_id = latency_assessment::make_frame_id();
+          latency_assessment::report_timepoint(frame_id);
+          report_celsius_(frame_id, mock_data[i_mock++]);
           i_mock %= mock_data.size();
         }
       }
@@ -31,12 +34,12 @@ namespace rpi_rt {
         closing_ = true;
       }
 
-      virtual void set_celsius_reciever(std::function<void (float)> callback) override {
+      virtual void set_celsius_reciever(std::function<void (uint64_t frame_id, float)> callback) override {
         report_celsius_ = callback;
       }
 
     private:
-      std::function<void (float)> report_celsius_;
+      std::function<void (uint64_t, float)> report_celsius_;
       std::atomic<bool> closing_ = ATOMIC_VAR_INIT(false);
   };
 
