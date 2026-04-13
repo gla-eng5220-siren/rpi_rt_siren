@@ -7,10 +7,15 @@
 
 #include "third_party/argparse.hpp"
 
+#include <cerrno>
 #include <sstream>
 #include <stdexcept>
+#include <system_error>
 #include <thread>
 #include <iostream>
+#include <unistd.h>
+#include <signal.h>
+#include <sys/signalfd.h>
 
 static std::shared_ptr<rpi_rt::http_server_t> webui;
 
@@ -104,6 +109,14 @@ auto make_alarm_thread(const argparse::ArgumentParser& program) {
 }
 
 int main(int argc, char** argv) {
+  sigset_t mask;
+  sigemptyset(&mask);
+  sigaddset(&mask, SIGINT);
+  sigaddset(&mask, SIGQUIT);
+
+  if (sigprocmask(SIG_BLOCK, &mask, NULL) < 0)
+    throw std::system_error(std::make_error_code(std::errc(errno)));
+
   argparse::ArgumentParser program("flame_iris");
   program.add_argument("--libcamera")
     .help("libcamera camera index (e.g. 0)")
@@ -189,8 +202,24 @@ int main(int argc, char** argv) {
   sensor_logic_thread->run();
   alarm_thread->run();
 
-  for (;;) {
-    std::this_thread::sleep_for(std::chrono::seconds{10});
+  int sfd = signalfd(-1, &mask, 0);
+  if (sfd < 0)
+    throw std::system_error(std::make_error_code(std::errc(errno)));
+
+  bool running = true;
+  while (running) {
+    signalfd_siginfo fdsi;
+    ssize_t sz = read(sfd, &fdsi, sizeof(fdsi));
+    if (sz < 0)
+      throw std::system_error(std::make_error_code(std::errc(errno)));
+
+    switch (fdsi.ssi_signo) {
+      case SIGINT: // fallthrough
+      case SIGQUIT:
+        std::cout << "Gracefully exitting .." << std::endl;
+        running = false;
+        break;
+    }
   }
 
   sensor_logic_thread->close();
@@ -200,6 +229,8 @@ int main(int argc, char** argv) {
     webui->close();
     webui_thread.join();
   }
+
+  std::cout << "Bye!" << std::endl;
   return 0;
 }
 
