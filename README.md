@@ -15,6 +15,10 @@
 - **Inference Optimized**: BatchNorm and ReLU fused into Conv layers
 - **End-to-end Solution**: From V4L capture to alarming
 
+## Documents
+
+[Doxygen API Documents](https://gla-eng5220-siren.github.io/docs/)
+
 ## Demo Screenshots
 
 ![WebUI](/imgs/webui.png)
