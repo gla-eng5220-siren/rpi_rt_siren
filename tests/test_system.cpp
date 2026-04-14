@@ -13,6 +13,10 @@
 #include "alarm.hpp"
 #include "sensor.hpp"
 
+#ifndef TESTDATA_PATH
+  #define TESTDATA_PATH "testdata"
+#endif
+
 TEST_CASE("Frame", "[system][frame]") {
   rpi_rt::Frame<uint8_t> u8_frame{100, 80, 3};
   CHECK(u8_frame.height() == 100);
@@ -73,5 +77,23 @@ TEST_CASE("MockTempSensor", "[system][sensor]") {
   sensor->run();
   th.join();
   CHECK(got_data > 0);
+}
+
+TEST_CASE("MockCameraSensor", "[system][sensor][ffmpeg]") {
+  auto sensor = rpi_rt::create_mock_camera_sensor(TESTDATA_PATH "/vid.mp4");
+  size_t got_frame = 0;
+  sensor->set_frame_callback([&got_frame](rpi_rt::Frame<uint8_t> frame) {
+    CHECK(frame.height() > 0);
+    CHECK(frame.width() > 0);
+    CHECK(frame.channels() == 3);
+    got_frame++;
+  });
+  std::thread th{[&sensor](){
+    std::this_thread::sleep_for(std::chrono::seconds{2});
+    sensor->close();
+  }};
+  sensor->run();
+  th.join();
+  CHECK(got_frame > 0);
 }
 
