@@ -13,6 +13,14 @@
 
 namespace rpi_rt::logic::shufflenet {
 
+/**
+ * This operator separates the input feature map into two outputs with equal
+ * channel size. It is used in ShuffleNet-like architectures where features
+ * are divided into two branches for further processing.
+ *
+ * The operator assumes that the two output frames together contain all input
+ * channels and that both outputs have the same spatial dimensions as the input.
+ */
 template <class Elem>
 class Chunk {
 public:
