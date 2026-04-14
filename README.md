@@ -17,6 +17,16 @@
 
 ## Documents
 
+### Tutorials
+
+[1. Setting Up Raspberry Pi](wiki/1.-Setting-Up-Raspberry-Pi.md)
+[2. Quick Start](wiki/2.-Quick-Start.md)
+[3. Alarming Methods](wiki/3.-Alarming-Methods.md)
+[4. Camera Sensors](wiki/4.-Camera-Sensors.md)
+[5. Temperature Sensors](wiki/5.-Temperature-Sensors.md)
+[6. SOLID Principles](wiki/6.-SOLID-Principles.md)
+[7. Latency Assessment](wiki/7.-Latency-Assessment.md)
+
 [Doxygen API Documents](https://gla-eng5220-siren.github.io/docs/)
 
 ## Demo Screenshots
@@ -44,37 +54,39 @@ CMake and at least one working C++ compiler are required as well.
 
 Instructions for Debian or Raspbian Trixie:
 
-~~~
-sudo apt-get install cmake g++ libjpeg-dev libv4l-dev libcatch2-dev libxnnpack-dev libpthreadpool-dev libavformat-dev libavcodec-dev libavutil-dev libswscale-dev pkg-config libssl-dev libgpiod-dev libcamera-dev
-~~~
+```
+sudo apt-get install cmake g++ pkg-config \
+libjpeg-dev libv4l-dev libcatch2-dev \
+libxnnpack-dev libpthreadpool-dev \
+libavformat-dev libavcodec-dev libavutil-dev libswscale-dev \
+libssl-dev libgpiod-dev libcamera-dev
+```
 
 If you don't install the suggested version of XNNPACK or Catch2, it will be automatically downloaded and compiled. Beware this may take very long.
 
 ### Building
 
-~~~
-cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -S . -B build
-cmake --build build
-~~~
+```
+mkdir -p build/release
+cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -S . -B build/release
+cmake --build build/release
+```
 
 ### Running
 
-~~~
-./build/release/flame_iris --libcamera 0 --model testdata/model --alarm-stdout
-~~~
+Some example setup:
 
-You will see output like:
+```
+./build/release/flame_iris --mock-temp --alarm-stdout
 
-~~~
-Visual LOGIT: 8.25474 THRESHOLD: 0 [NO FIRE]
-Visual LOGIT: 8.3169 THRESHOLD: 0 [NO FIRE]
-Visual LOGIT: 8.30164 THRESHOLD: 0 [NO FIRE]
-...
-~~~
+./build/release/flame_iris \
+  --libcamera 0 \
+  --buzzer 26 \
+  --model testdata/model \
+  --webui-path webui
+```
 
-A few caveats (temporarily):
-
-* For now, the program will continuously output detection results to stdout. We will support the buzzer and sound alarm in the future.
+See [Quick Start](/wiki/2.-Quick-Start.md) for more usage info.
 
 ## Affiliation
 
