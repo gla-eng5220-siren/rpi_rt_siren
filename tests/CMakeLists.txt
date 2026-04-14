@@ -28,6 +28,7 @@ include(Catch)
 
 set(TEST_SRCS
     test_shufflenet.cpp
+    test_system.cpp
 )
 
 foreach(test_src IN ITEMS ${TEST_SRCS})
@@ -42,8 +43,7 @@ foreach(test_src IN ITEMS ${TEST_SRCS})
     TESTDATA_PATH="${PROJECT_SOURCE_DIR}/testdata"
   )
   target_link_libraries(${test_target} PUBLIC Catch2::Catch2WithMain
-    Threads::Threads
-    XNNPACK::XNNPACK
+    flame_iris_core
   )
   catch_discover_tests(${test_target})
 endforeach()
