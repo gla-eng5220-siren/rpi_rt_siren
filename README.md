@@ -3,8 +3,6 @@
 
 # FlameIris: End-to-end Vision-led Real-time Fire Detection and Alarming
 
-**WARNING**: Development is actively in process as part of a course project. Some functions are incomplete and still in development.
-
 **FlameIris** is an end-to-end vision-led fire detection solution, organized and optimized for real-time edge-based deployment. Our primary target platform is *Raspberry Pi 5 4GB*. [ShuffleNetV2OnFire](https://github.com/NeelBhowmik/efficient-compact-fire-detection-cnn) is deployed and optimized for size and speed. It works with sensors and alarms in a real-time architecture.
 
 ## Highlights
@@ -19,13 +17,13 @@
 
 ### Tutorials
 
-[1. Setting Up Raspberry Pi](wiki/1.-Setting-Up-Raspberry-Pi.md)
-[2. Quick Start](wiki/2.-Quick-Start.md)
-[3. Alarming Methods](wiki/3.-Alarming-Methods.md)
-[4. Camera Sensors](wiki/4.-Camera-Sensors.md)
-[5. Temperature Sensors](wiki/5.-Temperature-Sensors.md)
-[6. SOLID Principles](wiki/6.-SOLID-Principles.md)
-[7. Latency Assessment](wiki/7.-Latency-Assessment.md)
+- [1. Setting Up Raspberry Pi](wiki/1.-Setting-Up-Raspberry-Pi.md)
+- [2. Quick Start](wiki/2.-Quick-Start.md)
+- [3. Alarming Methods](wiki/3.-Alarming-Methods.md)
+- [4. Camera Sensors](wiki/4.-Camera-Sensors.md)
+- [5. Temperature Sensors](wiki/5.-Temperature-Sensors.md)
+- [6. SOLID Principles](wiki/6.-SOLID-Principles.md)
+- [7. Latency Assessment](wiki/7.-Latency-Assessment.md)
 
 [Doxygen API Documents](https://gla-eng5220-siren.github.io/docs/)
 
