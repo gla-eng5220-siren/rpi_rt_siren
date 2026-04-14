@@ -15,11 +15,7 @@ pkg_check_modules(LibGpiod REQUIRED IMPORTED_TARGET GLOBAL libgpiod libgpiodcxx)
 pkg_check_modules(LibCamera REQUIRED IMPORTED_TARGET GLOBAL libcamera libcamera-base)
 find_package(OpenSSL COMPONENTS Crypto SSL REQUIRED)
 
-enable_testing()
-add_subdirectory(tests)
-
-add_executable(flame_iris
-  src/flame_iris.cpp
+add_library(flame_iris_core STATIC
   src/sensor/v4l2_camera.cpp
   src/sensor/libcamera.cpp
   src/sensor/mock_camera.cpp
@@ -34,10 +30,10 @@ add_executable(flame_iris
   src/alarm/buzzer.cpp
   src/http_server/http_server.cpp
 )
-target_include_directories(flame_iris PRIVATE
+target_include_directories(flame_iris_core PUBLIC
   ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
-target_link_libraries(flame_iris PRIVATE
+target_link_libraries(flame_iris_core PUBLIC
   Threads::Threads
   XNNPACK::XNNPACK
   PkgConfig::LibV4l2
@@ -51,4 +47,14 @@ target_link_libraries(flame_iris PRIVATE
   OpenSSL::Crypto
   OpenSSL::SSL
 )
+
+add_executable(flame_iris
+  src/flame_iris.cpp
+)
+target_link_libraries(flame_iris PRIVATE
+  flame_iris_core
+)
+
+enable_testing()
+add_subdirectory(tests)
 
