@@ -35,6 +35,18 @@ namespace rpi_rt {
       virtual void close() = 0;
   };
 
+  struct breadpi_ntc_config_t{
+    std::string i2c_bus = "/dev/i2c-1";
+    unsigned short i2c_addr = 0x48;
+    int adc_channel = 1;
+
+    float vref = 3.3f;
+    float r_fixed = 10000.0f;
+    float r_25 = 10000.0f;
+    float beta = 3435.0f;
+    bool ntc_top = false;
+  };
+
   /**
    * The base class for all temperature sensors.
    *
@@ -77,7 +89,7 @@ namespace rpi_rt {
    * Adhere to the Interface Segregation Principle (ISP) in SOLID.
    */
   std::shared_ptr<temperature_sensor_t> create_mock_temperature_sensor();
-
+  std::shared_ptr<temperature_sensor_t> create_breadpi_temperature_sensor(const breadpi_ntc_config_t& cfg);
   /**
    * The factory method for creating a camera_sensor_t reporting mock data.
    *

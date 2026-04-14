@@ -74,6 +74,27 @@ auto make_sensor_logic_thread(const argparse::ArgumentParser& program) {
         program.get<std::string>("--mock-cam"));
     auto logic = make_vision_logic(program);
     thread = make_vision_thread(sensor, logic);
+} else if (program.present<int>("--ntc-adc")) {
+    rpi_rt::breadpi_ntc_config_t cfg;
+    cfg.adc_channel = program.get<int>("--ntc-adc");
+    cfg.beta = program.get<float>("--ntc-beta");
+    cfg.i2c_addr = program.get<int>("--ntc-i2c-addr");
+    cfg.i2c_bus = program.get<std::string>("--ntc-i2c-bus");
+    cfg.ntc_top = program.get<bool>("--ntc-top");
+    cfg.r_25 = program.get<float>("--ntc-r25");
+    cfg.r_fixed = program.get<float>("--ntc-rfixed");
+    cfg.vref = program.get<float>("--ntc-vref");
+
+    auto sensor = rpi_rt::create_breadpi_temperature_sensor(cfg);
+    auto logic = std::make_shared<rpi_rt::temperature_threshold_logic_t>();
+    logic->celsius_threshold(program.get<float>("--temp-threshold"));
+    auto t_thread = std::make_unique<
+      rpi_rt::SensorLogicThread<
+        rpi_rt::temperature_sensor_t, rpi_rt::temperature_threshold_logic_t>>();
+    t_thread->set_sensor(sensor);
+    t_thread->set_logic(logic);
+    thread = std::move(t_thread);
+} else if (program.get<bool>("--mock-temp")) {
   } else if (program.get<bool>("--mock-temp")) {
     auto sensor = rpi_rt::create_mock_temperature_sensor();
     auto logic = std::make_shared<rpi_rt::temperature_threshold_logic_t>();
@@ -129,6 +150,9 @@ int main(int argc, char** argv) {
   program.add_argument("--mock-temp")
     .flag()
     .help("Use mocked temperature sensor");
+  program.add_argument("--breadpi-temp")
+    .flag()
+    .help("Use BreadPi NTC temperature sensor");
   program.add_argument("--alarm-stdout")
     .help("Print alarm message to stdout")
     .flag();
@@ -172,6 +196,37 @@ int main(int argc, char** argv) {
     .help("Brevo email alarming receiver name");
   program.add_argument("--brevo-to-email")
     .help("Brevo email alarming receiver email");
+
+  // breadpi ntc
+  program.add_argument("--ntc-adc")
+    .scan<'i', int>()
+    .help("BreadPi ADC channel for NTC temperature sensor");
+  program.add_argument("--ntc-beta")
+    .default_value(3435.0f)
+    .scan<'g', float>()
+    .help("Beta constant for NTC temperature sensor");
+  program.add_argument("--ntc-i2c-addr")
+    .default_value(0x48)
+    .scan<'i', int>()
+    .help("BreadPi ADC I2C address for NTC temperature sensor");
+  program.add_argument("--ntc-i2c-bus")
+    .default_value("/dev/i2c-1")
+    .help("BreadPi ADC I2C bus for NTC temperature sensor");
+  program.add_argument("--ntc-top")
+    .help("If the NTC is mounted near Vref instead of GND")
+    .flag();
+  program.add_argument("--ntc-r25")
+    .default_value(10000.0f)
+    .scan<'g', float>()
+    .help("The NTC resistance at 25 degree");
+  program.add_argument("--ntc-rfixed")
+    .default_value(10000.0f)
+    .scan<'g', float>()
+    .help("The fixed resistance in series with the NTC");
+  program.add_argument("--ntc-vref")
+    .default_value(3.3f)
+    .scan<'g', float>()
+    .help("The voltage value of Vref");
 
   program.parse_args(argc, argv);
 
