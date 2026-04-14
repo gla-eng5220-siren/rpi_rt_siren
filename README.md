@@ -86,6 +86,39 @@ Some example setup:
 
 See [Quick Start](/wiki/2.-Quick-Start.md) for more usage info.
 
+## Division of Labour
+
+- [@omegacoleman] (https://github.com/omegacoleman), system design, vision-based detection
+- [@lbqwq] (https://github.com/lbqwq), NTC temperature sensor software
+- [@TamDiMan] (https://github.com/TamDiMan), Buzzer alarming method
+- [@keleguan553-eng] (https://github.com/keleguan553-eng), NTC temperature sensor hardware
+- [@tanglijie0408-droid] (https://github.com/tanglijie0408-droid), documentation
+
+## Credits
+
+Following projects are used as source-redistribution
+
+- [libi2c](https://github.com/amaork/libi2c), MIT License
+- [nlohmann/json](https://github.com/nlohmann/json), MIT License
+- [cpp-httplib](https://github.com/yhirose/cpp-httplib), MIT License
+- [argparse](https://github.com/p-ranav/argparse), MIT License
+- [base64](https://github.com/tobiaslocker/base64), MIT License
+
+The MIT License is compatible with out license for source redistribution.
+
+Following projects are used as dependencies:
+
+- libjpeg, Libjpeg License
+- libcamera, LGPL-2.1-or-later
+- libv4l, LGPL-2.1-or-later
+- libgpiod, LGPL-2.1-or-later
+- catch2, BSL-1.0 License
+- xnnpack, BSD License
+- FFMPEG, LGPL-2.1-or-later and GPL-2
+- OpenSSL, Apache License v2 (3.0 or after), or dual OpenSSL and SSLeay license (others)
+
+Many thanks to all these open source projects!
+
 ## Affiliation
 
 <p align="center"><img src="/imgs/uofg_logo.png" height="200"></p>
