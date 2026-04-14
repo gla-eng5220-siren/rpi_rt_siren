@@ -43,7 +43,6 @@ namespace rpi_rt {
         while(!closing_) {
           cond_camera_.wait_for(lg, std::chrono::milliseconds{500});
         }
-        std::cerr << "???" << std::endl;
       }
 
       virtual void close() override {
