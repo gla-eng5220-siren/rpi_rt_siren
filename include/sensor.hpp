@@ -62,7 +62,7 @@ namespace rpi_rt {
        *
        * Adhere to the Interface Segregation Principle (ISP) in SOLID.
        */
-      virtual void set_celsius_reciever(std::function<void (float)> callback) = 0;
+      virtual void set_celsius_reciever(std::function<void (uint64_t frame_id, float)> callback) = 0;
   };
 
   /**
@@ -80,7 +80,7 @@ namespace rpi_rt {
        *
        * Adhere to the Interface Segregation Principle (ISP) in SOLID.
        */
-      virtual void set_frame_callback(std::function<void (Frame<uint8_t>)> callback) = 0;
+      virtual void set_frame_callback(std::function<void (uint64_t frame_id, Frame<uint8_t>)> callback) = 0;
   };
 
   /**

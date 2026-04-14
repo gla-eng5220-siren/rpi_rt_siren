@@ -16,8 +16,8 @@ namespace rpi_rt {
       visual_detection_result(float logit, float logit_threshold)
         : logit_(logit), logit_threshold_(logit_threshold)
       {}
-      visual_detection_result(float logit, float logit_threshold, Frame<uint8_t> frame)
-        : logit_(logit), logit_threshold_(logit_threshold), frame_(frame)
+      visual_detection_result(float logit, float logit_threshold, Frame<uint8_t> frame, uint64_t frame_id)
+        : logit_(logit), logit_threshold_(logit_threshold), frame_(frame), frame_id_(frame_id)
       {}
       virtual ~visual_detection_result() {}
 
@@ -42,16 +42,21 @@ namespace rpi_rt {
         return {};
       }
 
+      virtual uint64_t frame_id() const noexcept override {
+        return frame_id_;
+      }
+
     private:
       float logit_;
       float logit_threshold_;
+      uint64_t frame_id_ = 0;
       std::optional<Frame<uint8_t>> frame_ = std::nullopt;
   };
 
-  void visual_classify_logic_t::process(const Frame<uint8_t>& frame) {
+  void visual_classify_logic_t::process(uint64_t frame_id, const Frame<uint8_t>& frame) {
     float logit = model_->process(frame);
     auto result = std::make_unique<visual_detection_result>(
-        logit, logit_threshold_, frame);
+        logit, logit_threshold_, frame, frame_id);
     last_logit_ = logit;
     callback_(std::move(result));
   }

@@ -31,6 +31,12 @@ namespace rpi_rt {
       virtual std::vector<uint8_t> jpg_attachment() {
         return {};
       };
+      /**
+       * Returns a positive frame id associated with input, if present
+       */
+      virtual uint64_t frame_id() const noexcept {
+        return 0;
+      }
   };
 }
 

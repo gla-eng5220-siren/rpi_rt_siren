@@ -23,11 +23,11 @@ namespace rpi_rt {
       std::shared_ptr<visual_classify_logic_t> l,
       std::shared_ptr<http_server_t> webui
     ) {
-      s->set_frame_callback([l, webui](rpi_rt::Frame<uint8_t> frame) {
+      s->set_frame_callback([l, webui](uint64_t frame_id, rpi_rt::Frame<uint8_t> frame) {
         if (webui) {
           webui->set_cam_frame(frame);
         }
-        l->process(frame);
+        l->process(frame_id, frame);
         if (webui) {
           webui->set_logit(l->last_logit());
         }
@@ -40,8 +40,8 @@ namespace rpi_rt {
       std::shared_ptr<http_server_t> webui
     ) {
       (void) webui; // TODO report this too maybe?
-      s->set_celsius_reciever([l](float celsius) {
-        l->process(celsius);
+      s->set_celsius_reciever([l](uint64_t frame_id, float celsius) {
+        l->process(frame_id, celsius);
       });
     }
   }

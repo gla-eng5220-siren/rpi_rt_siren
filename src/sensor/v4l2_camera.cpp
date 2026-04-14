@@ -58,7 +58,7 @@ namespace rpi_rt {
         closing_ = true;
       }
 
-      virtual void set_frame_callback(std::function<void (Frame<uint8_t>)> callback) override {
+      virtual void set_frame_callback(std::function<void (uint64_t frame_id, Frame<uint8_t>)> callback) override {
         callback_ = callback;
       }
 
@@ -183,15 +183,18 @@ namespace rpi_rt {
       }
 
       void invoke_callback(const mmap_buffer_t& buffer) {
+        uint64_t frame_id = latency_assessment::make_frame_id();
+        latency_assessment::report_timepoint(frame_id);
+
         Frame<uint8_t> frame{height_, width_, 3};
 
         assert(buffer.size >= frame.size());
         std::memcpy(frame.data(), buffer.data, frame.size());
-        callback_(std::move(frame));
+        callback_(frame_id, std::move(frame));
       }
 
       const std::string device_ = "/dev/video0";
-      std::function<void (Frame<uint8_t>)> callback_;
+      std::function<void (uint64_t, Frame<uint8_t>)> callback_;
       std::atomic<bool> closing_ = ATOMIC_VAR_INIT(false);
       size_t height_ = 0;
       size_t width_ = 0;
