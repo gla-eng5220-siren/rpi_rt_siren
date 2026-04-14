@@ -19,11 +19,15 @@ add_library(flame_iris_core STATIC
   src/sensor/v4l2_camera.cpp
   src/sensor/libcamera.cpp
   src/sensor/mock_camera.cpp
+  src/sensor/breadpi_temperature_sensor.cpp
+  src/sensor/i2c.c
   src/logic/shufflenet.cpp
   src/logic/temperature_threshold_logic.cpp
   src/logic/visual_classify_logic.cpp
   src/misc/jpeg_utils.cpp
   src/sensor/mock_temperature_sensor.cpp
+  src/sensor/breadpi_temperature_sensor.cpp
+  src/sensor/i2c.c
   src/alarm/stdout_alarm.cpp
   src/alarm/buzzer_alarm.cpp
   src/alarm/brevo_email_alarm.cpp
