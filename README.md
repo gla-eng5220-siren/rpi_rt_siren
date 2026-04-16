@@ -5,13 +5,21 @@
 
 **FlameIris** is an end-to-end vision-led fire detection solution, organized and optimized for real-time edge-based deployment. Our primary target platform is *Raspberry Pi 5 4GB*. [ShuffleNetV2OnFire](https://github.com/NeelBhowmik/efficient-compact-fire-detection-cnn) is deployed and optimized for size and speed. It works with sensors and alarms in a real-time architecture.
 
+## Promo Video
+
+[![FlameIris Promo Video](https://img.youtube.com/vi/2VXpjlj39jE/0.jpg)](https://www.youtube.com/watch?v=2VXpjlj39jE)
+
+[Youtube Video](https://www.youtube.com/watch?v=2VXpjlj39jE)
+
+[Bilibili Video](https://www.bilibili.com/video/BV1dKdvBhEdZ)
+
 ## Highlights
 
 - **Vision-Based**: Detect fire with a webcam!
 - **Configurable Threshold**: Need these alarms to be a little more or less sensitive? No problem!
 - **Real Time**: Faster detection, faster alarming, low latency
 - **Inference Optimized**: BatchNorm and ReLU fused into Conv layers
-- **End-to-end Solution**: From V4L capture to alarming
+- **End-to-end Solution**: From LibCamera/V4L capture to alarming
 
 ## Documents
 
@@ -88,11 +96,11 @@ See [Quick Start](/wiki/2.-Quick-Start.md) for more usage info.
 
 ## Division of Labour
 
-- [@omegacoleman] (https://github.com/omegacoleman), system design, vision-based detection
-- [@lbqwq] (https://github.com/lbqwq), NTC temperature sensor software
-- [@TamDiMan] (https://github.com/TamDiMan), Buzzer alarming method
-- [@keleguan553-eng] (https://github.com/keleguan553-eng), NTC temperature sensor hardware
-- [@tanglijie0408-droid] (https://github.com/tanglijie0408-droid), documentation
+- [@omegacoleman](https://github.com/omegacoleman), system design, vision-based detection
+- [@lbqwq](https://github.com/lbqwq), NTC temperature sensor software
+- [@TamDiMan](https://github.com/TamDiMan), Buzzer alarming method
+- [@keleguan553-eng](https://github.com/keleguan553-eng), NTC temperature sensor hardware
+- [@tanglijie0408-droid](https://github.com/tanglijie0408-droid), documentation
 
 ## Credits
 
@@ -104,7 +112,7 @@ Following projects are used as source-redistribution
 - [argparse](https://github.com/p-ranav/argparse), MIT License
 - [base64](https://github.com/tobiaslocker/base64), MIT License
 
-The MIT License is compatible with out license for source redistribution.
+The MIT License is compatible with our license for source redistribution.
 
 Following projects are used as dependencies:
 
